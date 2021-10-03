@@ -4,7 +4,6 @@ engine.name = 'PolyPerc'
 
 sequins = include 'lib/sequins'
 Vox = include 'lib/vox'
-
 MusicUtil = require 'musicutil'
 
 scale = MusicUtil.generate_scale_of_length(60, 'lydian', 7)
