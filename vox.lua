@@ -53,10 +53,3 @@ V = {5,7,9}
 VI = {6,8,10}
 VII = {7,9,11}
 --
-
-
-crow.ii.jf.mode(1)
-crow.ii.wsyn.ar_mode(1)
-
-bass = Vox:new{synth = function(note, level) crow.ii.jf.play_voice(6, note, level) end}
-
