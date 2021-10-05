@@ -23,17 +23,20 @@ VII = {7,9,11}
 a = Vox:new{
   synth = function(note, level) return note, level end--usersynth
   scale = scale('mixolydian'),
+
   vox = {
     degree = sequins{1,3,5,7,9,11,13},
     dyn = {
       degree = function() return a.vox.degree() end
     }
   },
+
   clk = {
     sync = sequins{1/4,1/4,1/2},
     dyn = {
       sync = function() return a.clk.sync() end
     },
+
   action = function()
     while true do
       a:play(a.vox.dyn)
