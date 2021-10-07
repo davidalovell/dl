@@ -2,7 +2,7 @@
 
 engine.name = 'PolyPerc'
 
-sequins = require 'sequins'
+sequins = include 'lib/sequins'
 Vox = include 'lib/vox'
 MusicUtil = require 'musicutil'
 m = midi.connect()
