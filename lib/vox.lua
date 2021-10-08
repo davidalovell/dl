@@ -14,7 +14,13 @@ function Vox:new(args)
   o.wrap = args.wrap ~= nil and args.wrap or false
   o.mask = args.mask
   o.negharm = args.negharm ~= nil and args.negharm or false
-  o.seq = args.seq == nil and {} or args.seq
+
+  -- TODO
+  -- o.length = args.length == nil and 1/8 or args.length
+
+  o.vox = args.vox == nil and {} or args.vox
+  o.clk = args.clk == nil and {} or args.clk
+  o.action = args.action == nil and {} or args.action
 
   return o
 end
@@ -39,7 +45,7 @@ function Vox:play(args)
   val = negharm and (7 - scale[ix]) % 12 or scale[ix]
   note = val + transpose + (octave * 12)
 
-  return on and synth(note, level)
+  return on and synth(note, level)--, length)
 end
 
 function Vox.update(data)
