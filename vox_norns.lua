@@ -2,17 +2,25 @@
 
 engine.name = 'PolyPerc'
 
-sequins = require 'sequins'
+engine.name = 'PolyPerc'
 MusicUtil = require 'musicutil'
 Vox = include 'lib/vox'
+sequins = require 'sequins'
 m = midi.connect()
 
 function scale(scale)
   return MusicUtil.generate_scale_of_length(60, scale, 7)
 end
 
-function note(note_num, snap_array)
+function snap(note_num, snap_array)
   return MusicUtil.snap_note_to_array(note_num, snap_array)
+end
+
+m.event = function(data)
+  local msg = midi.to_msg(data)
+  msg.note = snap(msg.note, scale('lydian'))
+  local data = midi.to_data(msg)
+  m:send(data)
 end
 
 usersynth = function(note, level) engine.hz(MusicUtil.note_num_to_freq(note)) end
@@ -20,7 +28,7 @@ midisynth = function(note, level)
   clock.run(
     function()
       m:note_on(note, level * 127)--[[; m:note_off(note)]]
-      clock.sync(1/4)
+      clock.sync(1/16)
       m:note_off(note)
     end
   )
@@ -62,6 +70,7 @@ a = Vox:new{
   end
 }
 
+m:start()
 a.clock = clock.run(a.action)
 
 
@@ -70,21 +79,4 @@ b = Vox:new{
   scale = scale('mixolydian')
 }
 
-
-m.event = function(data)
-
-
-  
-  local d = midi.to_msg(data)
-
-  if d.type == 'note_on' then
-    m:note_on(d.note, d.vel)
-    m:note_on(d.note + 7, d.vel)
-  end
-
-  if d.type == 'note_off' then
-    m:note_off(d.note, d.vel)
-    m:note_off(d.note + 7, d.vel)
-  end
-end
 
