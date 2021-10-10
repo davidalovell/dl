@@ -1,8 +1,5 @@
 -- vox
 
--- norns.script.load('code/vox_norns/vox_norns.lua')
-engine.name = 'PolyPerc'
-
 engine.name = 'PolyPerc'
 music = require 'musicutil'
 vox = include 'lib/vox'
@@ -19,6 +16,7 @@ nornssynth = function(note, level)
 end
 
 function midisynth(note, level, length, channel)
+  level = math.ceil(level * 127)
   clock.run(
     function()
       m:note_on(note, level, channel)
@@ -44,10 +42,13 @@ a = vox:new{
   synth = midisynth,
   scale = scale('mixolydian'),
 
-  vox = {
+  seq = {
     degree = s{1,1,5,7,9,8},
+    level = s{1,0.3,1,0.4,0.7,0.6},
     dyn = {
-      degree = function() return a.vox.degree() end
+      degree = function() return a.seq.degree() end,
+      level = function() return a.seq.level() end,
+      length = function() return 1 / math.random(2,32) end
     }
   },
 
@@ -61,7 +62,7 @@ a = vox:new{
 
   action = function()
     while true do
-      a:play(a.vox.dyn)
+      a:play(a.seq.dyn)
       clock.sync(a.clk.dyn.sync())
     end
   end
@@ -70,3 +71,18 @@ a = vox:new{
 -- start clocks
 m:start()
 a.clock = clock.run(a.action)
+
+-- start
+function start()
+  norns.script.load('code/vox_norns/vox_norns.lua')
+end
+
+-- stop
+function stop()
+  for i = 0, 127 do
+    m:note_off(i)
+  end
+  m:stop()
+  clock.cleanup()
+end
+

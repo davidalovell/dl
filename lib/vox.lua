@@ -5,7 +5,7 @@ function Vox:new(args)
   local args = args == nil and {} or args
 
   o.on = args.on == nil and true or args.on
-  o.level = args.level == nil and 127 or args.level -- max cc velocity
+  o.level = args.level == nil and 1 or args.level -- max cc velocity
   o.scale = args.scale == nil and {0,2,4,6,7,9,11} or args.scale -- lydian
   o.transpose = args.transpose == nil and 0 or args.transpose -- C0
   o.degree = args.degree == nil and 1 or args.degree
@@ -20,7 +20,7 @@ function Vox:new(args)
   o.channel = args.channel == nil and 1 or args.channel
 
   -- empty tables
-  o.vox = args.vox == nil and {} or args.vox
+  o.seq = args.seq == nil and {} or args.seq
   o.clk = args.clk == nil and {} or args.clk
   o.action = args.action == nil and {} or args.action
 
