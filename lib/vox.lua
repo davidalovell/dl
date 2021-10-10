@@ -9,14 +9,15 @@ function Vox:new(args)
   o.scale = args.scale == nil and {0,2,4,6,7,9,11} or args.scale -- lydian
   o.transpose = args.transpose == nil and 0 or args.transpose -- C0
   o.degree = args.degree == nil and 1 or args.degree
-  o.octave = args.octave == nil and 3 or args.octave -- C3
-  o.synth = args.synth == nil and function(note, level) return note, level end or args.synth
+  o.octave = args.octave == nil and 5 or args.octave -- C5
+  o.synth = args.synth == nil and function(note, level, length, channel) return note, level, length, channel end or args.synth
   o.wrap = args.wrap ~= nil and args.wrap or false
   o.mask = args.mask -- could use snap?
   o.negharm = args.negharm ~= nil and args.negharm or false
 
-  -- TODO
-  -- o.dur = args.dur == nil and 1/8 or args.dur
+  -- midi specific
+  o.length = args.length == nil and 1/8 or args.length
+  o.channel = args.channel == nil and 1 or args.channel
 
   -- empty tables
   o.vox = args.vox == nil and {} or args.vox
@@ -29,6 +30,7 @@ end
 function Vox:play(args)
   local args = args == nil and {} or self.update(args)
   local on, level, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
+  local length, channel
 
   on = self.on and (args.on == nil and true or args.on)
   level = self.level * (args.level == nil and 1 or args.level)
@@ -41,12 +43,16 @@ function Vox:play(args)
   mask = args.mask == nil and self.mask or args.mask
   negharm = args.negharm == nil and self.negharm or args.negharm
 
+  -- midi specific
+  length = args.length == nil and self.length or args.length
+  channel = args.channel == nil and self.channel or args.channel
+
   octave = wrap and octave or octave + math.floor(degree / #scale)
   ix = mask and self.apply_mask(degree, scale, mask) % #scale + 1 or degree % #scale + 1
   val = negharm and (7 - scale[ix]) % 12 or scale[ix]
   note = val + transpose + (octave * 12)
 
-  return on and synth(note, level)--, length)
+  return on and synth(note, level, --[[last two args are midi specific]] length, channel)
 end
 
 function Vox.update(data)
@@ -57,7 +63,7 @@ function Vox.update(data)
   return updated
 end
 
-function Vox.apply_mask(degree, scale, mask) -- change this to snap
+function Vox.apply_mask(degree, scale, mask) -- ?change this to snap
   local ix, closest_val = degree % #scale + 1, mask[1]
   for _, val in ipairs(mask) do
     val = (val - 1) % #scale + 1
