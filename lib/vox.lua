@@ -16,7 +16,7 @@ function Vox:new(args)
   o.negharm = args.negharm ~= nil and args.negharm or false
 
   -- midi specific
-  o.length = args.length == nil and 1/8 or args.length
+  o.length = args.length == nil and 1 or args.length
   o.channel = args.channel == nil and 1 or args.channel
 
   -- empty tables
@@ -44,7 +44,7 @@ function Vox:play(args)
   negharm = args.negharm == nil and self.negharm or args.negharm
 
   -- midi specific
-  length = args.length == nil and self.length or args.length
+  length = self.length * (args.length == nil and 1 or args.length)
   channel = args.channel == nil and self.channel or args.channel
 
   octave = wrap and octave or octave + math.floor(degree / #scale)

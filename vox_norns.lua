@@ -43,7 +43,7 @@ a = vox:new{
   scale = scale('mixolydian'),
 
   seq = {
-    degree = s{1,1,5,7,9,8},
+    degree = s{1,1,5,7,s{9,9,9,-2},s{8,5,11,0}},
     level = s{1,0.3,1,0.4,0.7,0.6},
     dyn = {
       degree = function() return a.seq.degree() end,
