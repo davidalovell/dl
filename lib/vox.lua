@@ -5,19 +5,20 @@ function Vox:new(args)
   local args = args == nil and {} or args
 
   o.on = args.on == nil and true or args.on
-  o.level = args.level == nil and 1 or args.level
-  o.scale = args.scale == nil and {0,2,4,6,7,9,11} or args.scale
-  o.transpose = args.transpose == nil and 0 or args.transpose
+  o.level = args.level == nil and 127 or args.level -- max cc velocity
+  o.scale = args.scale == nil and {0,2,4,6,7,9,11} or args.scale -- lydian
+  o.transpose = args.transpose == nil and 0 or args.transpose -- C0
   o.degree = args.degree == nil and 1 or args.degree
-  o.octave = args.octave == nil and 0 or args.octave
+  o.octave = args.octave == nil and 3 or args.octave -- C3
   o.synth = args.synth == nil and function(note, level) return note, level end or args.synth
   o.wrap = args.wrap ~= nil and args.wrap or false
-  o.mask = args.mask
+  o.mask = args.mask -- could use snap?
   o.negharm = args.negharm ~= nil and args.negharm or false
 
   -- TODO
-  -- o.length = args.length == nil and 1/8 or args.length
+  -- o.dur = args.dur == nil and 1/8 or args.dur
 
+  -- empty tables
   o.vox = args.vox == nil and {} or args.vox
   o.clk = args.clk == nil and {} or args.clk
   o.action = args.action == nil and {} or args.action
@@ -56,7 +57,7 @@ function Vox.update(data)
   return updated
 end
 
-function Vox.apply_mask(degree, scale, mask)
+function Vox.apply_mask(degree, scale, mask) -- change this to snap
   local ix, closest_val = degree % #scale + 1, mask[1]
   for _, val in ipairs(mask) do
     val = (val - 1) % #scale + 1
@@ -66,25 +67,25 @@ function Vox.apply_mask(degree, scale, mask)
   return degree
 end
 
-function Vox:newseq(args)
-  local args = args == nil and {} or args
-  self.addseq = function(self, args)
-    self.seq.dyn = self.seq.dyn == nil and {} or self.seq.dyn
-    for k, v in pairs(args) do
-      self['seq'][k] = v
-      self['seq']['dyn'][k] = (type(v) == 'function' or type(v) == 'table') and function() return v() end or v
-    end
-  end
+-- function Vox:newseq(args)
+--   local args = args == nil and {} or args
+--   self.addseq = function(self, args)
+--     self.seq.dyn = self.seq.dyn == nil and {} or self.seq.dyn
+--     for k, v in pairs(args) do
+--       self['seq'][k] = v
+--       self['seq']['dyn'][k] = (type(v) == 'function' or type(v) == 'table') and function() return v() end or v
+--     end
+--   end
 
-  -- self.seq.sync = function()
-  --   return
-  --     self.seq.sync() *
-  --     self.seq.division *
-  --     all.division *
-  -- end
+--   -- self.seq.sync = function()
+--   --   return
+--   --     self.seq.sync() *
+--   --     self.seq.division *
+--   --     all.division *
+--   -- end
 
-  self:addseq(args)
-end
+--   self:addseq(args)
+-- end
 
 -- helper functions
 function Vset(objects, property, val)

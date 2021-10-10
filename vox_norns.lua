@@ -9,7 +9,11 @@ sequins = require 'sequins'
 m = midi.connect()
 
 function scale(scale)
-  return MusicUtil.generate_scale_of_length(60, scale, 7)
+  return MusicUtil.generate_scale_of_length(0, scale, 7)
+end
+
+function scale2(scale)
+  return MusicUtil.generate_scale_of_length(0, scale, 7), MusicUtil.generate_scale_of_length(0, scale, 127)
 end
 
 function snap(note_num, snap_array)
