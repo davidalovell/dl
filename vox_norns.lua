@@ -1,43 +1,34 @@
 -- vox
 
+-- norns.script.load('code/vox_norns/vox_norns.lua')
 engine.name = 'PolyPerc'
 
 engine.name = 'PolyPerc'
-MusicUtil = require 'musicutil'
-Vox = include 'lib/vox'
-sequins = require 'sequins'
+music = require 'musicutil'
+vox = include 'lib/vox'
+s = require 'sequins'
 m = midi.connect()
 
 function scale(scale)
-  return MusicUtil.generate_scale_of_length(0, scale, 7)
+  return music.generate_scale_of_length(0, scale, 7)
 end
 
-function scale2(scale)
-  return MusicUtil.generate_scale_of_length(0, scale, 7), MusicUtil.generate_scale_of_length(0, scale, 127)
+-- synths
+nornssynth = function(note, level)
+  engine.hz(music.note_num_to_freq(note))
 end
 
-function snap(note_num, snap_array)
-  return MusicUtil.snap_note_to_array(note_num, snap_array)
-end
-
-m.event = function(data)
-  local msg = midi.to_msg(data)
-  msg.note = snap(msg.note, scale('lydian'))
-  local data = midi.to_data(msg)
-  m:send(data)
-end
-
-usersynth = function(note, level) engine.hz(MusicUtil.note_num_to_freq(note)) end
-midisynth = function(note, level)
+function midisynth(note, level, length, channel)
   clock.run(
     function()
-      m:note_on(note, level * 127)--[[; m:note_off(note)]]
-      clock.sync(1/16)
-      m:note_off(note)
+      m:note_on(note, level, channel)
+      clock.sync(length)
+      m:note_off(note, level, channel)
     end
   )
 end
 
+-- masks
 I = {1,3,5}
 II = {2,4,6}
 III = {3,5,7}
@@ -47,22 +38,24 @@ VI = {6,8,10}
 VII = {7,9,11}
 --
 
-
-a = Vox:new{
+-- declare voices and sequencers
+a = vox:new{
+  octave = 3,
   synth = midisynth,
   scale = scale('mixolydian'),
 
   vox = {
-    degree = sequins{1,3,5,7,9,11,13},
+    degree = s{1,1,5,7,9,8},
     dyn = {
       degree = function() return a.vox.degree() end
     }
   },
 
   clk = {
-    sync = sequins{1/4,1/4,1/2},
+    division = 1/2,
+    sync = s{2,2,2,1,1/2,1/2},
     dyn = {
-      sync = function() return a.clk.sync() end
+      sync = function() return a.clk.sync() * a.clk.division end
     }
   },
 
@@ -74,13 +67,6 @@ a = Vox:new{
   end
 }
 
+-- start clocks
 m:start()
 a.clock = clock.run(a.action)
-
-
-b = Vox:new{
-  synth = midisynth,
-  scale = scale('mixolydian')
-}
-
-
