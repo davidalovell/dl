@@ -1,4 +1,6 @@
 -- vox
+-- norns.script.load('code/vox_norns/vox_norns.lua')
+
 
 engine.name = 'PolyPerc'
 music = require 'musicutil'
@@ -6,9 +8,20 @@ vox = include 'lib/vox'
 s = require 'sequins'
 m = midi.connect()
 
+
+-- scale
 function scale(scale)
   return music.generate_scale_of_length(0, scale, 7)
 end
+
+-- diatonic triads
+I = {1,3,5}
+II = {2,4,6}
+III = {3,5,7}
+IV = {4,6,8}
+V = {5,7,9}
+VI = {6,8,10}
+VII = {7,9,11}
 
 -- synths
 nornssynth = function(note, level)
@@ -26,35 +39,26 @@ function midisynth(note, level, length, channel)
   )
 end
 
--- masks
-I = {1,3,5}
-II = {2,4,6}
-III = {3,5,7}
-IV = {4,6,8}
-V = {5,7,9}
-VI = {6,8,10}
-VII = {7,9,11}
---
-
 -- declare voices and sequencers
+chord = s{1,5,4}
+
+
+
 a = vox:new{
   octave = 3,
   synth = midisynth,
-  scale = scale('mixolydian'),
 
   seq = {
-    degree = s{1,1,5,7,s{9,9,9,-2},s{8,5,11,0}},
-    level = s{1,0.3,1,0.4,0.7,0.6},
+    degree = s{1,3,5,7},
     dyn = {
       degree = function() return a.seq.degree() end,
-      level = function() return a.seq.level() end,
       length = function() return 1 / math.random(2,32) end
     }
   },
 
   clk = {
-    division = 1/2,
-    sync = s{2,2,2,1,1/2,1/2},
+    division = 1,
+    sync = s{2,1,1/2,1/2},
     dyn = {
       sync = function() return a.clk.sync() * a.clk.division end
     }
@@ -68,21 +72,44 @@ a = vox:new{
   end
 }
 
--- start clocks
-m:start()
-a.clock = clock.run(a.action)
+b = vox:new{
+  synth = midisynth,
+  channel = 2,
 
--- start
-function start()
-  norns.script.load('code/vox_norns/vox_norns.lua')
+  seq = {
+    degree = s{1,3,5,7,9,11,13,15,17,19},
+  },
+
+  clk = {
+    sync = s{3,6,3,2,1,1,1,5},
+    division = 1/8
+  },
+
+  action = function()
+    while true do
+      b:play{degree = a.seq.degree()}
+      clock.sync(b.clk.sync() * b.clk.division)
+    end
+  end
+}
+
+
+function clock.transport.start()
+  print("we begin")
+  a.clock = clock.run(a.action)
+  b.clock = clock.run(b.action)
 end
 
--- stop
-function stop()
+function clock.transport.stop()
+  clock.cancel(a.clock)
+  clock.cancel(b.clock)
+
+  a.seq.degree:reset()
+  a.clk.sync:reset()
+  b.seq.degree:reset()
+  b.clk.sync:reset()
+
   for i = 0, 127 do
     m:note_off(i)
   end
-  m:stop()
-  clock.cleanup()
 end
-

@@ -52,7 +52,7 @@ function Vox:play(args)
   val = negharm and (7 - scale[ix]) % 12 or scale[ix]
   note = val + transpose + (octave * 12)
 
-  return on and synth(note, level, --[[last two args are midi specific]] length, channel)
+  return on and synth(note, level, length, channel)
 end
 
 function Vox.update(data)
@@ -83,24 +83,22 @@ end
 --     end
 --   end
 
---   -- self.seq.sync = function()
---   --   return
---   --     self.seq.sync() *
---   --     self.seq.division *
---   --     all.division *
---   -- end
+  -- self.clk.sync = function()
+  --   return
+  --     self.seq.sync() *
+  --     self.seq.division *
+  -- end
 
 --   self:addseq(args)
 -- end
 
--- helper functions
-function Vset(objects, property, val)
+function Vox.set(objects, property, val)
   for k, v in pairs(objects) do
     v[property] = val
   end
 end
 
-function Vdo(objects, method, args)
+function Vox.call(objects, method, args)
   for k, v in pairs(objects) do
     v[method](v, args)
   end
