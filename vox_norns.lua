@@ -59,15 +59,13 @@ a = vox:new{
   clk = {
     division = 1,
     sync = s{2,1,1/2,1/2},
-    dyn = {
-      sync = function() return a.clk.sync() * a.clk.division end
-    }
+    dyn = function() return a.clk.sync() * a.clk.division end
   },
 
   action = function()
     while true do
       a:play(a.seq.dyn)
-      clock.sync(a.clk.dyn.sync())
+      clock.sync(a.clk.dyn())
     end
   end
 }
@@ -77,38 +75,45 @@ b = vox:new{
   channel = 2,
 
   seq = {
-    degree = s{1,3,5,7,9,11,13,15,17,19},
+    degree = s{1,3,5,7},
+    dyn = {
+      degree = function() return b.seq.degree() end
+    }
   },
 
   clk = {
     sync = s{3,6,3,2,1,1,1,5},
-    division = 1/8
+    division = 1/8,
+    dyn = function() return b.clk.sync() * b.clk.division end
   },
 
   action = function()
     while true do
-      b:play{degree = a.seq.degree()}
-      clock.sync(b.clk.sync() * b.clk.division)
+      b:play(b.seq.dyn)
+      clock.sync(b.clk.dyn())
     end
   end
 }
 
 
 function clock.transport.start()
-  print("we begin")
   a.clock = clock.run(a.action)
   b.clock = clock.run(b.action)
 end
 
 function clock.transport.stop()
   clock.cancel(a.clock)
-  clock.cancel(b.clock)
-
   a.seq.degree:reset()
   a.clk.sync:reset()
+
+  clock.cancel(b.clock)
   b.seq.degree:reset()
   b.clk.sync:reset()
 
+  midi_notes_off()
+end
+
+function midi_notes_off()
   for i = 0, 127 do
     m:note_off(i)
   end
