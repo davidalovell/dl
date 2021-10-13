@@ -1,11 +1,12 @@
 -- vox
--- norns.script.load('code/vox_norns/vox_norns.lua')
 
 
 engine.name = 'PolyPerc'
 music = require 'musicutil'
 vox = include 'lib/vox'
-s = require 'sequins'
+seq = include 'lib/seq'
+s = include 'lib/sequins'
+-- s = require 'sequins'
 m = midi.connect()
 
 
@@ -47,22 +48,23 @@ chord = s{1,5,4}
 a = vox:new{
   octave = 3,
   synth = midisynth,
+  scale = scale('mixolydian'),
 
   seq = {
-    degree = s{1,3,5,7},
+    degree = s{1,5,7,7}:every(4),
     dyn = {
-      degree = function() return a.seq.degree() end,
-      length = function() return 1 / math.random(2,32) end
+      degree = function() a.seq.degree() return a.seq.degree[a.seq.degree.ix] end,
+      length = function() return 1 / math.random(2,4) end
     }
   },
 
   clk = {
-    division = 1,
+    division = 1/2,
     sync = s{2,1,1/2,1/2},
     dyn = function() return a.clk.sync() * a.clk.division end
   },
 
-  action = function()
+  action = function(t)
     while true do
       a:play(a.seq.dyn)
       clock.sync(a.clk.dyn())
@@ -71,13 +73,14 @@ a = vox:new{
 }
 
 b = vox:new{
+  on = false,
   synth = midisynth,
   channel = 2,
 
   seq = {
     degree = s{1,3,5,7},
     dyn = {
-      degree = function() return b.seq.degree() end
+      degree = function() b.seq.degree() return b.seq.degree[b.seq.degree.ix] - 1 end
     }
   },
 
@@ -97,6 +100,7 @@ b = vox:new{
 
 
 function clock.transport.start()
+  clock.run(function() clock.sync(16) end)
   a.clock = clock.run(a.action)
   b.clock = clock.run(b.action)
 end
@@ -118,3 +122,17 @@ function midi_notes_off()
     m:note_off(i)
   end
 end
+
+function r()
+  norns.script.load('code/vox_norns/vox_norns.lua')
+end
+
+
+c = s{10,20,30,40}:every(2)
+-- c()
+-- c:select(4)
+function helper()
+  local val = c()
+  print(val, c.ix, c[c.ix])
+end
+
