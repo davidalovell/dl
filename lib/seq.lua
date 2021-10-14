@@ -11,6 +11,7 @@ function Seq:new(args)
   o.prob = t.prob == nil and 1 or t.prob
   o.offset = t.offset == nil and 0 or t.offset
   o.action = t.action
+  -- add index here
 
   o._division = 1
   o._step = 1
@@ -29,40 +30,22 @@ function Seq:__step() return self.step * self._step end
 function Seq:play_seq()
   -- NEW 
   local args = args == nil and {} or self.update(args)
-  local division, step
+  local sequence, division, step, every, prob, --[[offset,]] action
   
+  sequence = args.sequence == nil and self.sequence or args.sequence
   division = args.division == nil and self.division or args.division
   step = args.step == nil and self.step or args.step
-  
+  every = args.every == nil and self.every or args.every
+  prob = args.prob == nil and self.prob or args.prob
+  -- offset = args.offset == nil and self.offset or args.offset
+  action = args.action == nil and self.action or args.action
+ 
   -- TODO:
   -- 1. add other args
   -- 2. remove _division, _step
   -- 2. change from __division() and __step() to something like that in Vox
   -- 4. comments to define count, div_count, step_count
-  -- 5. ? remove s = self (low priority)
-  
-  
-  
-  
-  -- some example code from Vox
---   local args = args == nil and {} or self.update(args)
---   local on, level, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
---   local length, channel
-
---   on = self.on and (args.on == nil and true or args.on)
---   level = self.level * (args.level == nil and 1 or args.level)
---   scale = args.scale == nil and self.scale or args.scale
---   transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
---   degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
---   octave = self.octave + (args.octave == nil and 0 or args.octave)
---   synth = args.synth == nil and self.synth or args.synth
---   wrap = args.wrap == nil and self.wrap or args.wrap
---   mask = args.mask == nil and self.mask or args.mask
---   negharm = args.negharm == nil and self.negharm or args.negharm
-  --
-  
-  
-  
+  -- 5. ? remove s = self (low priority)  
   
   local s = self
   s.count = s.count + 1
