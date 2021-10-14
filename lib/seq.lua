@@ -27,28 +27,38 @@ function Seq:__division() return self.division * self._division end
 function Seq:__step() return self.step * self._step end
 
 function Seq:play_seq()
-  -- new stuff 
+  -- NEW 
   local args = args == nil and {} or self.update(args)
-  -- TODO
+  local division, step
+  
+  division = args.division == nil and self.division or args.division
+  step = args.step == nil and self.step or args.step
+  
+  -- TODO:
+  -- 1. add other args
+  -- 2. remove _division, _step
+  -- 2. change from __division() and __step() to something like that in Vox
+  -- 4. comments to define count, div_count, step_count
+  -- 5. ? remove s = self (low priority)
   
   
   
   
   -- some example code from Vox
-  local args = args == nil and {} or self.update(args)
-  local on, level, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
-  local length, channel
+--   local args = args == nil and {} or self.update(args)
+--   local on, level, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
+--   local length, channel
 
-  on = self.on and (args.on == nil and true or args.on)
-  level = self.level * (args.level == nil and 1 or args.level)
-  scale = args.scale == nil and self.scale or args.scale
-  transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
-  degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
-  octave = self.octave + (args.octave == nil and 0 or args.octave)
-  synth = args.synth == nil and self.synth or args.synth
-  wrap = args.wrap == nil and self.wrap or args.wrap
-  mask = args.mask == nil and self.mask or args.mask
-  negharm = args.negharm == nil and self.negharm or args.negharm
+--   on = self.on and (args.on == nil and true or args.on)
+--   level = self.level * (args.level == nil and 1 or args.level)
+--   scale = args.scale == nil and self.scale or args.scale
+--   transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
+--   degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
+--   octave = self.octave + (args.octave == nil and 0 or args.octave)
+--   synth = args.synth == nil and self.synth or args.synth
+--   wrap = args.wrap == nil and self.wrap or args.wrap
+--   mask = args.mask == nil and self.mask or args.mask
+--   negharm = args.negharm == nil and self.negharm or args.negharm
   --
   
   
