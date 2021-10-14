@@ -11,15 +11,14 @@ function Seq:new(args)
   o.prob = t.prob == nil and 1 or t.prob
   o.offset = t.offset == nil and 0 or t.offset
   o.action = t.action
-  -- add index here
 
-  o._division = 1
-  o._step = 1
+  o._division = 1 -- remove
+  o._step = 1 -- remove
 
   o.count = - o.offset
   o.div_count = 0
   o.step_count = 0
-  o.index = 1
+  o.index = t.index == nil and 1 or t.index
 
   return o
 end
@@ -30,7 +29,7 @@ function Seq:__step() return self.step * self._step end
 function Seq:play_seq()
   -- NEW 
   local args = args == nil and {} or self.update(args)
-  local sequence, division, step, every, prob, --[[offset,]] action
+  local sequence, division, step, every, prob, --[[offset,]] action, index
   
   sequence = args.sequence == nil and self.sequence or args.sequence
   division = args.division == nil and self.division or args.division
@@ -39,6 +38,7 @@ function Seq:play_seq()
   prob = args.prob == nil and self.prob or args.prob
   -- offset = args.offset == nil and self.offset or args.offset
   action = args.action == nil and self.action or args.action
+  index = args.index == nil and self.index or args.index
  
   -- TODO:
   -- 1. add other args
