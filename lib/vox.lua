@@ -74,6 +74,7 @@ function Vox.apply_mask(degree, scale, mask)
 end
 
 -- *****
+-- Will need some major work to link the two
 -- function Voice:play_voice(val)
 --   self:action(val)
 --   self:play_note()
