@@ -52,7 +52,7 @@ function Seq:play(args)
     or seq[self.ix] --or 0
 end
 
-function Seq:reset(args)
+function Seq:reset()
   self.offset_count = - self.offset
   self.div_count = 0
   self.step_count = 1 - self.step
