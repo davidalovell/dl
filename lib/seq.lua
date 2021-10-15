@@ -55,7 +55,7 @@ end
 function Seq:reset(args)
   self.offset_count = - self.offset
   self.div_count = 0
-  self.step_count = 1 - o.step
+  self.step_count = 1 - self.step
   self.ix = 1
 end
 
