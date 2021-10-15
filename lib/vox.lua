@@ -20,8 +20,8 @@ function Vox:new(args)
   o.channel = args.channel == nil and 1 or args.channel
 
   -- empty tables
-  o.seq = args.seq == nil and {} or args.seq
-  o.clk = args.clk == nil and {} or args.clk
+  o.seq = args.seq == nil and {} or args.seq -- change to s
+  o.clk = args.clk == nil and {} or args.clk -- change to c
   o.action = args.action == nil and {} or args.action
 
   return o
@@ -63,7 +63,7 @@ function Vox.update(data)
   return updated
 end
 
-function Vox.apply_mask(degree, scale, mask) -- ?change this to snap
+function Vox.apply_mask(degree, scale, mask)
   local ix, closest_val = degree % #scale + 1, mask[1]
   for _, val in ipairs(mask) do
     val = (val - 1) % #scale + 1
@@ -72,6 +72,34 @@ function Vox.apply_mask(degree, scale, mask) -- ?change this to snap
   local degree = closest_val - 1
   return degree
 end
+
+-- *****
+-- function Voice:play_voice(val)
+--   self:action(val)
+--   self:play_note()
+-- end
+
+-- function Voice:new_seq(args)
+--   args.action = type(args.action) == 'function' and args.action or args.action and function(val) self:play_voice(val) end
+--   self.s[#self.s + 1] = Seq:new(t) -- may need updating to find specified name of object i.e. Seq
+-- end
+
+-- function Voice:play_seq(index)
+--   if index == nil then
+--     for k, v in pairs(self.seq) do
+--       local play = self.s[k].action and self.s[k]:play_seq()
+--     end
+--   else
+--     return self.s[index]:play_seq()
+--   end
+-- end
+
+-- function Voice:reset()
+--   for k, v in pairs(self.seq) do
+--     self.s[k]:reset()
+--   end
+-- end
+-- *****
 
 function Vox.set(objects, property, val)
   for k, v in pairs(objects) do
