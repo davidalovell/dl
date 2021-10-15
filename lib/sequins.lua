@@ -2,6 +2,8 @@
 -- nestable tables with sequencing behaviours & control flow
 -- TODO i think ASL can be defined in terms of a sequins...
 
+-- DL 2021-10-15
+-- behaviour modified so :every(2) changes on first, rather than last
 
 local S = {}
 
@@ -112,7 +114,7 @@ function S.extend(self, t)
 end
 
 function S._every(self)
-    return (self.ix % turtle(self.n)) == 0
+    return (self.ix % turtle(self.n)) == --[[0]] 1 -- ***************************** DL change *****************************
 end
 
 function S._times(self)
