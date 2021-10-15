@@ -67,4 +67,8 @@ function Seq.update(data)
   return updated
 end
 
+function Seq.call_if_fn(val)
+  return type(val) == 'function' and val() or val
+end
+
 return Seq
