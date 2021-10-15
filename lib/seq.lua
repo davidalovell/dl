@@ -9,6 +9,7 @@ function Seq:new(args)
   o.step = args.step == nil and 1 or args.step
   o.skip = args.skip == nil and 1 or args.skip
   o.prob = args.prob == nil and 1 or args.prob
+	
   o.offset = args.offset == nil and 0 or args.offset
   o.action = args.action
 
@@ -22,7 +23,7 @@ end
 
 function Seq:play(args)
   local args = args == nil and {} or self.update(args)
-  local seq, div, step, skip, prob, action
+  local seq, div, step, skip, prob
   local next
   
   seq = args.seq == nil and self.seq or args.seq
@@ -32,7 +33,6 @@ function Seq:play(args)
 	  -- step = self.step * (args.step == nil and 1 or args.step)
   skip = args.skip == nil and self.skip or args.skip
   prob = args.prob == nil and self.prob or args.prob
-  action = args.action == nil and self.action or args.action
 
   self.offset_count = self.offset_count + 1
 
