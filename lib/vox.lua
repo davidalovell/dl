@@ -1,5 +1,5 @@
--- Vox lib
 local Vox = {}
+
 function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
   local args = args == nil and {} or args
@@ -72,25 +72,6 @@ function Vox.apply_mask(degree, scale, mask) -- ?change this to snap
   local degree = closest_val - 1
   return degree
 end
-
--- function Vox:newseq(args)
---   local args = args == nil and {} or args
---   self.addseq = function(self, args)
---     self.seq.dyn = self.seq.dyn == nil and {} or self.seq.dyn
---     for k, v in pairs(args) do
---       self['seq'][k] = v
---       self['seq']['dyn'][k] = (type(v) == 'function' or type(v) == 'table') and function() return v() end or v
---     end
---   end
-
-  -- self.clk.sync = function()
-  --   return
-  --     self.seq.sync() *
-  --     self.seq.division *
-  -- end
-
---   self:addseq(args)
--- end
 
 function Vox.set(objects, property, val)
   for k, v in pairs(objects) do
