@@ -12,7 +12,7 @@ function Seq:new(args)
   o.offset = args.offset == nil and 0 or args.offset
   o.action = args.action
 
-  o.count = - o.offset
+  o.offset_count = - o.offset
   o.div_count = 0
   o.step_count = 1 - o.step
   o.ix = 1
@@ -34,26 +34,26 @@ function Seq:play(args)
   prob = args.prob == nil and self.prob or args.prob
   action = args.action == nil and self.action or args.action
 
-  self.count = self.count + 1
+  self.offset_count = self.offset_count + 1
 
-  self.div_count = self.count >= 1
+  self.div_count = self.offset_count >= 1
     and self.div_count % div + 1
     or self.div_count
 
-  self.step_count = self.count >= 1 and self.div_count == 1
+  self.step_count = self.offset_count >= 1 and self.div_count == 1
     and ((self.step_count + step) - 1) % #seq + 1
     or self.step_count
 
-  next = (self.count - 1) % skip == 0 and prob >= math.random()
+  next = (self.offset_count - 1) % skip == 0 and prob >= math.random()
   self.ix = next and self.step_count or self.ix
 	
-  return next and self.count >= 1 and self.div_count == 1 and self.action ~= nil
+  return next and self.offset_count >= 1 and self.div_count == 1 and self.action ~= nil
     and self.action(seq[self.ix])
     or seq[self.ix] --or 0
 end
 
 function Seq:reset(args)
-  self.count = - self.offset
+  self.offset_count = - self.offset
   self.div_count = 0
   self.step_count = 1 - o.step
   self.ix = 1
