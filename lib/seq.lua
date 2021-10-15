@@ -14,16 +14,13 @@ function Seq:new(args)
 
   o.count = - o.offset
   o.div_count = 0
-  o.step_count = 0
+  o.step_count = 1 - o.step
   o.ix = 1
 
   return o
 end
 
 function Seq:play(args)
-  -- TODO:
-  -- 1. step(2) starts and index = 2, and should start at 1 
-
   local args = args == nil and {} or self.update(args)
   local seq, div, step, skip, prob, action
   local next
@@ -58,7 +55,7 @@ end
 function Seq:reset(args)
   self.count = - self.offset
   self.div_count = 0
-  self.step_count = 0
+  self.step_count = 1 - o.step
   self.ix = 1
 end
 
