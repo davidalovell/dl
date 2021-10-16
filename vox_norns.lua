@@ -8,10 +8,46 @@ engine.name = 'PolyPerc'
 music = require 'musicutil'
 vox = include 'lib/vox'
 seq = include 'lib/seq'
-s = include 'lib/sequins'
--- s = require 'sequins'
-m = midi.connect()
 
+s = include 'lib/sequins_DL'
+-- sequins helper fn
+function ns(sequins)
+  local s = sequins()
+  return type(s) == 'table' and sequins.ix or s
+end
+-- attempt to add to the object
+-- function s:ns(self)
+--   local s = self()
+--   return type(s) == 'table' and self.ix or s
+-- end
+
+m = midi.connect()
+-- midi helper fn
+function midi_notes_off()
+  for i = 0, 127 do
+    m:note_off(i)
+  end
+end
+
+-- transport
+function clock.transport.start()
+  clock.run(function() clock.sync(16) end)
+  a.clock = clock.run(a.action, 1/4)
+end
+
+function clock.transport.stop()
+  cancel(a)
+  midi_notes_off()
+end
+
+function cancel(object)
+  clock.cancel(object.clock)
+  object.seq:reset()
+
+  for k, v in pairs(object.s) do
+    object.s[k]:reset()
+  end
+end
 
 -- scale
 function scale(scale)
@@ -19,13 +55,7 @@ function scale(scale)
 end
 
 -- diatonic triads
-I = {1,3,5}
-II = {2,4,6}
-III = {3,5,7}
-IV = {4,6,8}
-V = {5,7,9}
-VI = {6,8,10}
-VII = {7,9,11}
+triad = { {1,3,5}, {2,4,6}, {3,5,7}, {4,6,8}, {5,7,9}, {6,8,10}, {7,9,11} }
 
 -- synths
 nornssynth = function(note, level)
@@ -44,112 +74,35 @@ function midisynth(note, level, length, channel)
 end
 
 -- declare voices and sequencers
-
-
 a = vox:new{
-  seq = {
-    seq:new{
-      seq = {1,2,3,4,6,7,8},
-      skip = 2,
-      action = function(val) a:play{degree = val} end
-    }
-  }
+  chanel = 1,
+  synth = midisynth,
+  scale = scale('mixolydian'),
+  octave = 6,
+  s = {
+    level = s{10,4,2},
+    octave = s{-1,0,1,0,-2},
+    skip = s{1,2,3,10,16}:every(4)--[[,
+    div = s{3,2,1}:every(2)]]
+  },
+  seq = seq:new{
+    seq = {1,2,3,4,5,6,7,8},
+    step = 3,
+    action = function(val)
+      a.seq.skip = ns(a.s.skip)
+      -- a.seq.div = ns(a.s.div)
+      return
+        a:play{
+          degree = val,
+          level = a.s.level()/10,
+          octave = a.s.octave()
+        }
+    end
+  },
+  action = function(sync)
+    while true do
+      a.seq:play()
+      clock.sync(sync)
+    end
+  end
 }
-
-
-c = s{1,2,3,s{4,5,6}}:every(2)
-
-function next(sequins)
-  local s = sequins()
-  return type(s) == 'table' and sequins.ix or s
-end
-
-
-
--- a = vox:new{
---   octave = 3,
---   synth = midisynth,
---   scale = scale('mixolydian'),
-
---   seq = {
---     degree = s{1,5,7,7}:every(4),
---     dyn = {
---       degree = function() a.seq.degree() return a.seq.degree[a.seq.degree.ix] end,
---       length = function() return 1 / math.random(2,4) end
---     }
---   },
-
---   clk = {
---     division = 1/2,
---     sync = s{2,1,1/2,1/2},
---     dyn = function() return a.clk.sync() * a.clk.division end
---   },
-
---   action = function(t)
---     while true do
---       a:play(a.seq.dyn)
---       clock.sync(a.clk.dyn())
---     end
---   end
--- }
-
--- b = vox:new{
---   on = false,
---   synth = midisynth,
---   channel = 2,
-
---   seq = {
---     degree = s{1,3,5,7},
---     dyn = {
---       degree = function() b.seq.degree() return b.seq.degree[b.seq.degree.ix] - 1 end
---     }
---   },
-
---   clk = {
---     sync = s{3,6,3,2,1,1,1,5},
---     division = 1/8,
---     dyn = function() return b.clk.sync() * b.clk.division end
---   },
-
---   action = function()
---     while true do
---       b:play(b.seq.dyn)
---       clock.sync(b.clk.dyn())
---     end
---   end
--- }
-
-
--- function clock.transport.start()
---   clock.run(function() clock.sync(16) end)
---   a.clock = clock.run(a.action)
---   b.clock = clock.run(b.action)
--- end
-
--- function clock.transport.stop()
---   clock.cancel(a.clock)
---   a.seq.degree:reset()
---   a.clk.sync:reset()
-
---   clock.cancel(b.clock)
---   b.seq.degree:reset()
---   b.clk.sync:reset()
-
---   midi_notes_off()
--- end
-
--- function midi_notes_off()
---   for i = 0, 127 do
---     m:note_off(i)
---   end
--- end
-
-
--- c = s{10,20,30,40}:every(2)
--- -- c()
--- -- c:select(4)
--- function helper()
---   local val = c()
---   print(val, c.ix, c[c.ix])
--- end
-

@@ -20,6 +20,8 @@ function Vox:new(args)
   o.channel = args.channel == nil and 1 or args.channel
 
   -- empty tables
+  o.s = args.s == nil and {} or args.s
+  o.c = args.c == nil and {} or args.c
   o.seq = args.seq == nil and {} or args.seq -- change to s
   o.clk = args.clk == nil and {} or args.clk -- change to c
   o.action = args.action == nil and {} or args.action
