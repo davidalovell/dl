@@ -32,11 +32,13 @@ end
 -- transport
 function clock.transport.start()
   clock.run(function() clock.sync(16) end)
-  a.clock = clock.run(a.action, 1/4)
+  a.clock = clock.run(a.action)
+  b.clock = clock.run(b.action)
 end
 
 function clock.transport.stop()
   cancel(a)
+  cancel(b)
   midi_notes_off()
 end
 
@@ -82,15 +84,13 @@ a = vox:new{
   s = {
     level = s{10,4,2},
     octave = s{-1,0,1,0,-2},
-    skip = s{1,2,3,10,16}:every(4)--[[,
-    div = s{3,2,1}:every(2)]]
+    skip = s{1,2,3,10,16}:every(4)
   },
   seq = seq:new{
     seq = {1,2,3,4,5,6,7,8},
-    step = 3,
+    step = -3,
     action = function(val)
       a.seq.skip = ns(a.s.skip)
-      -- a.seq.div = ns(a.s.div)
       return
         a:play{
           degree = val,
@@ -99,10 +99,43 @@ a = vox:new{
         }
     end
   },
-  action = function(sync)
+  action = function()
     while true do
       a.seq:play()
-      clock.sync(sync)
+      clock.sync(1/4)
+    end
+  end
+}
+
+b = vox:new{
+  chanel = 1,
+  synth = midisynth,
+  scale = scale('mixolydian'),
+  octave = 5,
+  degree = 5,
+  s = {
+    level = s{10,4,2}:step(2),
+    octave = s{-1,0,1,0,-2}:step(2),
+    skip = s{1,2,3,10,16}:every(4)
+  },
+  seq = seq:new{
+    offset = 4,
+    seq = {1,2,3,4,5,6,7,8},
+    step = 3,
+    action = function(val)
+      b.seq.skip = ns(b.s.skip)
+      return
+        b:play{
+          degree = val,
+          level = b.s.level()/10,
+          octave = b.s.octave()
+        }
+    end
+  },
+  action = function()
+    while true do
+      b.seq:play()
+      clock.sync(1/4)
     end
   end
 }
