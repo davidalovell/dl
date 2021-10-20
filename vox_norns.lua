@@ -1,27 +1,31 @@
 -- vox
 
+-- reload
 function r()
   norns.script.load('code/vox_norns/vox_norns.lua')
 end
 
+-- libs
 engine.name = 'PolyPerc'
 music = require 'musicutil'
 vox = include 'lib/vox'
 seq = include 'lib/seq'
-
 s = include 'lib/sequins_DL'
+m = midi.connect()
+
+-- music helper fn
+function scale(scale)
+  return music.generate_scale_of_length(0, scale, 7)
+end
+
+triad = { {1,3,5}, {2,4,6}, {3,5,7}, {4,6,8}, {5,7,9}, {6,8,10}, {7,9,11} }
+
 -- sequins helper fn
 function ns(sequins)
   local s = sequins()
   return type(s) == 'table' and sequins.ix or s
 end
--- attempt to add to the object
--- function s:ns(self)
---   local s = self()
---   return type(s) == 'table' and self.ix or s
--- end
 
-m = midi.connect()
 -- midi helper fn
 function midi_notes_off()
   for i = 0, 127 do
@@ -29,7 +33,16 @@ function midi_notes_off()
   end
 end
 
--- transport
+-- clock helper fn
+function cancel(object)
+  clock.cancel(object.clock)
+  object.seq:reset()
+  for k, v in pairs(object.s) do
+    object.s[k]:reset()
+  end
+end
+
+-- midi transport
 function clock.transport.start()
   clock.run(function() clock.sync(16) end)
   a.clock = clock.run(a.action)
@@ -41,23 +54,6 @@ function clock.transport.stop()
   cancel(b)
   midi_notes_off()
 end
-
-function cancel(object)
-  clock.cancel(object.clock)
-  object.seq:reset()
-
-  for k, v in pairs(object.s) do
-    object.s[k]:reset()
-  end
-end
-
--- scale
-function scale(scale)
-  return music.generate_scale_of_length(0, scale, 7)
-end
-
--- diatonic triads
-triad = { {1,3,5}, {2,4,6}, {3,5,7}, {4,6,8}, {5,7,9}, {6,8,10}, {7,9,11} }
 
 -- synths
 nornssynth = function(note, level)
@@ -77,7 +73,7 @@ end
 
 -- declare voices and sequencers
 a = vox:new{
-  chanel = 1,
+  channel = 1,
   synth = midisynth,
   scale = scale('mixolydian'),
   octave = 6,
@@ -88,7 +84,7 @@ a = vox:new{
   },
   seq = seq:new{
     seq = {1,2,3,4,5,6,7,8},
-    step = -3,
+    step = 3,
     action = function(val)
       a.seq.skip = ns(a.s.skip)
       return
@@ -108,7 +104,7 @@ a = vox:new{
 }
 
 b = vox:new{
-  chanel = 1,
+  channel = 1,
   synth = midisynth,
   scale = scale('mixolydian'),
   octave = 5,
@@ -121,7 +117,7 @@ b = vox:new{
   seq = seq:new{
     offset = 4,
     seq = {1,2,3,4,5,6,7,8},
-    step = 3,
+    step = -2,
     action = function(val)
       b.seq.skip = ns(b.s.skip)
       return
