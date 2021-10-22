@@ -1,4 +1,5 @@
 local Vox = {}
+seq = include 'lib/seq'
 
 function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
@@ -76,32 +77,31 @@ function Vox.apply_mask(degree, scale, mask)
 end
 
 -- *****
--- Will need some major work to link the two
--- function Voice:play_voice(val)
---   self:action(val)
---   self:play_note()
--- end
+function Vox:new_seq(args)
+  args = args == nil and {} or args
+  args.id = args.id == nil and #self.s + 1 or args.id
 
--- function Voice:new_seq(args)
---   args.action = type(args.action) == 'function' and args.action or args.action and function(val) self:play_voice(val) end
---   self.s[#self.s + 1] = Seq:new(t) -- may need updating to find specified name of object i.e. Seq
--- end
+  args.action = type(args.action) == 'function' and args.action
+    or args.action and function(val) return self:play{degree = val} end -- build a play_voice fn or similar
 
--- function Voice:play_seq(index)
---   if index == nil then
---     for k, v in pairs(self.seq) do
---       local play = self.s[k].action and self.s[k]:play_seq()
---     end
---   else
---     return self.s[index]:play_seq()
---   end
--- end
+  self.s[args.id] = seq:new(args)
+end
 
--- function Voice:reset()
---   for k, v in pairs(self.seq) do
---     self.s[k]:reset()
---   end
--- end
+function Vox:play_seq(id)
+  if id == nil then
+    for k, v in pairs(self.s) do
+      local play = self.s[k].action and self.s[k]:play()
+    end
+  else
+    return self.s[id]:play()
+  end
+end
+
+function Vox:reset()
+  for k, v in pairs(self.seq) do
+    self.s[k]:reset()
+  end
+end
 -- *****
 
 function Vox.set(objects, property, val)
