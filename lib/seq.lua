@@ -27,7 +27,8 @@ function Seq:play(args)
   local next
   
   seq = args.seq == nil and self.seq or args.seq
-  div = self.div * (args.div == nil and 1 or args.div)
+  -- div = self.div * (args.div == nil and 1 or args.div) --*** broken
+  div = args.div == nil and self.div or args.div
 	  -- div = args.div == nil and self.div or args.div
   step = args.step == nil and self.step or args.step
 	  -- step = self.step * (args.step == nil and 1 or args.step)
