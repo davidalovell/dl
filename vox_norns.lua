@@ -20,8 +20,8 @@ end
 
 triad = { {1,3,5}, {2,4,6}, {3,5,7}, {4,6,8}, {5,7,9}, {6,8,10}, {7,9,11} }
 
--- sequins helper fn
-function ns(sequins)
+-- sequins helper (cs = call sequins)
+function cs(sequins)
   local s = sequins()
   return type(s) == 'table' and sequins.ix or s
 end
@@ -45,13 +45,29 @@ end
 -- midi transport
 function clock.transport.start()
   clock.run(function() clock.sync(16) end)
-  a.clock = clock.run(a.action)
-  b.clock = clock.run(b.action)
+  lead1.clock = clock.run(
+    function()
+      while true do
+        lead1.clk.action()
+        clock.sync(lead1.clk.div)
+      end
+    end
+  )
+
+  lead2.clock = clock.run(
+    function() 
+      while true do
+        lead2.clk.action()
+        clock.sync(lead2.clk.div)
+      end
+    end
+  )
+
 end
 
 function clock.transport.stop()
-  cancel(a)
-  cancel(b)
+  cancel(lead1)
+  cancel(lead2)
   midi_notes_off()
 end
 
@@ -72,66 +88,78 @@ function midisynth(note, level, length, channel)
 end
 
 -- declare voices and sequencers
-a = vox:new{
+lead1 = vox:new{
   channel = 1,
   synth = midisynth,
   scale = scale('mixolydian'),
   octave = 6,
+
   s = {
+    degree = s{1,2,3,4,5,6,7,8}:step(3),
     level = s{10,4,2},
     octave = s{-1,0,1,0,-2},
     skip = s{1,2,3,10,16}:every(4)
   },
+
   seq = seq:new{
-    seq = {1,2,3,4,5,6,7,8},
-    step = 3,
     action = function(val)
-      a.seq.skip = ns(a.s.skip)
       return
-        a:play{
-          degree = val,
-          level = a.s.level()/10,
-          octave = a.s.octave()
+        lead1:play{
+          degree = cs(lead1.s.degree),
+          level = cs(lead1.s.level) / 10,
+          octave = cs(lead1.s.octave)
         }
     end
   },
-  action = function()
-    while true do
-      a.seq:play()
-      clock.sync(1/4)
+
+  clk = {
+    div = 1/4,
+    action = function()
+      return
+        lead1.seq:play{
+          skip = cs(lead1.s.skip)
+        }
     end
-  end
+  }
+  
 }
 
-b = vox:new{
+
+
+lead2 = vox:new{
   channel = 1,
   synth = midisynth,
   scale = scale('mixolydian'),
   octave = 5,
   degree = 5,
+
   s = {
+    degree = s{1,2,3,4,5,6,7,8}:step(-2),
     level = s{10,4,2}:step(2),
     octave = s{-1,0,1,0,-2}:step(2),
     skip = s{1,2,3,10,16}:every(4)
   },
+
   seq = seq:new{
     offset = 4,
-    seq = {1,2,3,4,5,6,7,8},
-    step = -2,
     action = function(val)
-      b.seq.skip = ns(b.s.skip)
       return
-        b:play{
-          degree = val,
-          level = b.s.level()/10,
-          octave = b.s.octave()
+        lead2:play{
+          degree = cs(lead2.s.degree),
+          level = cs(lead2.s.level) / 10,
+          octave = cs(lead2.s.octave)
         }
     end
   },
-  action = function()
-    while true do
-      b.seq:play()
-      clock.sync(1/4)
+
+  clk = {
+    div = 1/4,
+    action = function()
+      return
+        lead2.seq:play{
+          skip = cs(lead2.s.skip)
+        }
     end
-  end
+  }
+
 }
