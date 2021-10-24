@@ -2,7 +2,7 @@
 
 -- reload
 function r()
-  norns.script.load('code/vox_norns/vox_norns.lua')
+  norns.script.load('code/vox_norns/vn.lua')
 end
 
 -- libs
@@ -13,6 +13,21 @@ s = include 'lib/sequins_DL'
 vox = include 'lib/vox'
 seq = include 'lib/seq'
 m = midi.connect()
+
+-- midi transport
+function clock.transport.start()
+  clock.run(function() clock.sync(16) end)
+  lat:start()
+end
+
+function clock.transport.stop()
+  lat:stop()
+  cancel(lead1)
+  cancel(lead2)
+  cancel(bass)
+  cancel(poly)
+  midi_notes_off()
+end
 
 -- music helper fn
 function scale(scale)
@@ -36,50 +51,10 @@ end
 
 -- clock helper fn
 function cancel(object)
-  clock.cancel(object.clock)
   object.seq:reset()
   for k, v in pairs(object.s) do
     object.s[k]:reset()
   end
-end
-
--- midi transport
-function clock.transport.start()
-  clock.run(function() clock.sync(16) end)
-  lead1.clock = clock.run(
-    function()
-      while true do
-        lead1.clk.action()
-        clock.sync(lead1.clk.div)
-      end
-    end
-  )
-
-  lead2.clock = clock.run(
-    function() 
-      while true do
-        lead2.clk.action()
-        clock.sync(lead2.clk.div)
-      end
-    end
-  )
-
-  bass.clock = clock.run(
-    function() 
-      while true do
-        bass.clk.action()
-        clock.sync(bass.clk.div)
-      end
-    end
-  )
-
-end
-
-function clock.transport.stop()
-  cancel(lead1)
-  cancel(lead2)
-  cancel(bass)
-  midi_notes_off()
 end
 
 -- synths
@@ -98,7 +73,11 @@ function msynth(note, level, length, channel)
   )
 end
 
+
+
 -- declare voices and sequencers
+lat = lattice:new()
+
 
 lead1 = vox:new{
   on = true,
@@ -125,17 +104,16 @@ lead1 = vox:new{
     end
   },
 
-  clk = {
-    div = 1/4,
+  lat = lat:new_pattern{
+    division = 1/16,
     action = function()
       return
         lead1.seq:play{
           skip = cs(lead1.s.skip)
         }
     end
-  }
+  },
 }
-
 
 
 lead2 = vox:new{
@@ -165,8 +143,8 @@ lead2 = vox:new{
     end
   },
 
-  clk = {
-    div = 1/2,
+  lat = lat:new_pattern{
+    division = 1/8,
     action = function()
       return
         lead2.seq:play{
@@ -175,6 +153,7 @@ lead2 = vox:new{
     end
   }
 }
+
 
 bass = vox:new{
   channel = 2,
@@ -197,12 +176,38 @@ bass = vox:new{
     end
   },
 
-  clk = {
-    div = 1/2,
+  lat = lat:new_pattern{
+    division = 1/8,
     action = function()
       return
         bass.seq:play{
           skip = cs(bass.s.skip)
+        }
+    end
+  }
+}
+
+poly = vox:new{
+  synth = nsynth,
+  scale = scale('mixolydian'),
+  s = {
+    degree = s{1,4,5,s{7,9,7,13}}
+  },
+
+  seq = seq:new{
+    action = function(val)
+      return
+        poly:play{
+          degree = cs(poly.s.degree)
+        }
+    end
+  },
+
+  lat = lat:new_pattern{
+    division = 1/8,
+    action = function()
+      return
+        poly.seq:play{
         }
     end
   }
