@@ -9,7 +9,7 @@ end
 engine.name = 'PolyPerc'
 music = require 'musicutil'
 lattice = require 'lattice'
-s = include 'lib/sequins_DL'
+s = include 'lib/sequins_dl'
 vox = include 'lib/vox'
 seq = include 'lib/seq'
 m = midi.connect()
