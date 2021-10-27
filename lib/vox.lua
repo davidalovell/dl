@@ -1,5 +1,5 @@
 local Vox = {}
--- seq = include 'lib/seq'
+local sequins = require 'sequins' -- comment out if not using on norns
 
 function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
@@ -61,7 +61,9 @@ end
 function Vox.update(data)
   local updated = {}
   for k, v in pairs(data) do
-    updated[k] = type(v) == 'function' and data[k]() or data[k]
+    updated[k] = type(v) == 'function' or sequins.is_sequins(v)
+      and data[k]()
+      or data[k]
   end
   return updated
 end

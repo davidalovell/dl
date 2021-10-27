@@ -6,14 +6,16 @@ function r()
 end
 
 -- libs
-engine.name = 'MxSynths'
-local mxsynths_ = include('mx.synths/lib/mx.synths')
-mxsynths = mxsynths_:new()
+-- engine.name = 'MxSynths'
+-- local mxsynths_ = include('mx.synths/lib/mx.synths')
+-- mxsynths = mxsynths_:new()
+
+engine.name = 'PolyPerc'
 
 music = require('musicutil')
 vox = include('lib/vox')
 seq = include('lib/seq')
-s = include('lib/sequins_DL')
+s = include('lib/sequins_dl')
 
 -- music helper fn
 function scale(scale)
@@ -21,22 +23,21 @@ function scale(scale)
 end
 
 -- synths
-mx = function(note, level, length, channel)
-  engine.mx_note_on(note, level, length)
-end
+function mx(note, level, length) engine.mx_note_on(note, level, length) end
+function poly(note, level) engine.hz(music.note_num_to_freq(note)) end
 
 -- declare voices and sequencers
 
 lead1 = vox:new{
-  synth = mx,
+  synth = poly,
   scale = scale('mixolydian'),
   level = 2,
   length = 0.1,
   s = {
-    degree = s{1,2,3,4,5,6,7,8}:step(3),
+    degree = s{1,3,4,5,s{7,9,11,13}:every(2)}:step(2),
     skip = s{3,1,4},
     level = s{1,0.2,0.5,0.2},
-    octave = s{-1,0,1}
+    octave = s{-1,0,1,s{2}:every(4)}
   },
   seq = seq:new{
     action = function(val)
@@ -49,11 +50,11 @@ lead1 = vox:new{
     end
   },
   clk = {
-    div = 1,
+    div = 1/4,
     action = function()
       return
         lead1.seq:play{
-          skip = lead1.s.skip()
+          skip = lead1.s.skip() 
         }
     end
   }

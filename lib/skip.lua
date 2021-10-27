@@ -24,7 +24,7 @@ function Skip:play(args)
   
   self.count = self.count + 1
 
-  return self.count % skip == mod and val or nil
+  return self.count % skip == mod % skip and val or nil
 end
 
 function Skip:reset()

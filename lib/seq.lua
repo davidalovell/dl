@@ -1,4 +1,6 @@
+-- Seq
 local Seq = {}
+local sequins = require 'sequins' -- comment out if not using on norns
 
 function Seq:new(args)
   local o = setmetatable( {}, {__index = Seq} )
@@ -28,9 +30,9 @@ function Seq:play(args)
   
   seq = args.seq == nil and self.seq or args.seq
   div = args.div == nil and self.div or args.div
-  -- div = self.div * (args.div == nil and 1 or args.div) --*** broken
+  -- div = self.div * (args.div == nil and 1 or args.div)
   step = args.step == nil and self.step or args.step
-	  -- step = self.step * (args.step == nil and 1 or args.step)
+  -- step = self.step * (args.step == nil and 1 or args.step)
   skip = args.skip == nil and self.skip or args.skip
   prob = args.prob == nil and self.prob or args.prob
 
@@ -62,13 +64,11 @@ end
 function Seq.update(data)
   local updated = {}
   for k, v in pairs(data) do
-    updated[k] = type(v) == 'function' and data[k]() or data[k]
+    updated[k] = type(v) == 'function' or sequins.is_sequins(v)
+      and data[k]()
+      or data[k]
   end
   return updated
-end
-
-function Seq.call_if_fn(val)
-  return type(val) == 'function' and val() or val
 end
 
 return Seq
