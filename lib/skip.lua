@@ -1,5 +1,4 @@
 -- Skip object
--- does not work correctly when pass a sequins at :play{}
 
 Skip = {}
 

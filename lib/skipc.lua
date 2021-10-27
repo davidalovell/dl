@@ -6,9 +6,9 @@ local function skip(fn)
     function(skip, mod)
       skip = skip == nil and 1 or skip
       mod = mod == nil and 0 or mod
-      count = (count + 1) % skip
+      count = count + 1
       local val = fn()
-      return count == mod and val or nil
+      return count % skip == mod and val or nil
     end
 end
     
