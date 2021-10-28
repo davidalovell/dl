@@ -8,8 +8,7 @@ engine.name = 'PolyPerc'
 
 sequins = include('lib/sequins_dl'); s = sequins
 vox = include('lib/vox')
-
--- lattice = include('lattice/lib/lattice')
+lattice = include('lattice/lib/lattice')
 
 music = require 'musicutil'
 
@@ -27,18 +26,17 @@ function sync(sync, fn)
 end
 
 
-b = s{1,2,3,4,5,6,7,8}:every(2)
-
 lead = vox:new{
   synth = polyperc,
   scale = scale('lydian'),
   s = {
-    degree = s{1,2,3,4,5,6,7,8}:every(2)
+    degree = s{1,2,3,4,5,6,7,8},
+    sync = s{3,1}
   },
   c = {
     division = 1/8,
     action = function()
-      clock.sync(lead.c.division)
+      clock.sync(lead.s.sync() * lead.c.division)
       lead:play{degree = lead.s.degree}
     end
   }

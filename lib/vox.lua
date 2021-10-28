@@ -23,6 +23,7 @@ function Vox:new(args)
   -- empty tables
   o.s = args.s == nil and {} or args.s -- contaner for sequencers (sequins)
   o.c = args.c == nil and {} or args.c -- container for clock
+  o.l = args.l == nil and {} or args.l -- container for lattice
 
   return o
 end
