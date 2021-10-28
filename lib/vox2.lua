@@ -28,7 +28,18 @@ function Vox:new(args)
 end
 
 function Vox:p(args)
-  local args = args == nil and {} or self.update(args)
+  local args = args == nil and {} or args
+
+
+  local updated = {}
+  for k, v in pairs(data) do
+    updated[k] = type(v) == 'function' or sequins.is_sequins(v)
+			and data[k]()
+      or data[k]
+  end
+  args = updated
+
+
   local on, level, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
   local length, channel
 
@@ -55,15 +66,15 @@ function Vox:p(args)
   return not nul and on and synth(note, level, length, channel)
 end
 
-function Vox.update(data)
-  local updated = {}
-  for k, v in pairs(data) do
-    updated[k] = type(v) == 'function' or sequins.is_sequins(v)
-			and data[k]()
-      or data[k]
-  end
-  return updated
-end
+-- function Vox.update(data)
+--   local updated = {}
+--   for k, v in pairs(data) do
+--     updated[k] = type(v) == 'function' or sequins.is_sequins(v)
+-- 			and data[k]()
+--       or data[k]
+--   end
+--   return updated
+-- end
 
 function Vox.apply_mask(degree, scale, mask)
   local ix, closest_val = degree % #scale + 1, mask[1]
@@ -78,15 +89,15 @@ end
 function Vox:play(data) -- a way of playing sequins that return nil values, requires sequins lib to be modified
 	data = data == nil and {} or data
 	local t = {}
-	for k,v in pairs(data) do
+	for k, v in pairs(data) do
 		-- this line needs work 
 		-- if type(v) == 'function' or type(v) == sequins.is_sequins(v) then
 			-- t[k] = v()
 		-- else
 			-- t[k] = v
 		-- end
-		t[k] = type(v) == 'function' or sequins.is_sequins(v) and v() or v
-		-- t[k] = v()
+		-- t[k] = type(v) == 'function' or sequins.is_sequins(v) and data[k]() or data[k]
+		t[k] = v()
 		if t[k] == nil then return end
 	end
 	return self.p(self,t)
