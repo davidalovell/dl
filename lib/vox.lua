@@ -1,5 +1,5 @@
 local Vox = {}
-local sequins = require 'sequins' -- comment out if not using on norns
+local sequins = require('sequins')
 
 function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
@@ -21,17 +21,28 @@ function Vox:new(args)
   o.channel = args.channel == nil and 1 or args.channel
 
   -- empty tables
-  o.s = args.s == nil and {} or args.s
-  o.c = args.c == nil and {} or args.c
-  o.seq = args.seq == nil and {} or args.seq -- change to s
-  o.clk = args.clk == nil and {} or args.clk -- change to c
-  o.action = args.action == nil and {} or args.action
+  o.s = args.s == nil and {} or args.s -- contaner for sequencers (sequins)
+  o.c = args.c == nil and {} or args.c -- container for clock
 
   return o
 end
 
 function Vox:play(args)
-  local args = args == nil and {} or self.update(args)
+  local args = args == nil and {} or args
+  
+	local updated_args = {}
+	for k, v in pairs(args) do
+	  if s.is_sequins(v) or type(v) == 'function' then
+	    updated_args[k] = v()
+	  else
+	    updated_args[k] = v
+	  end
+		if updated_args[k] == nil then
+		  return
+		end
+	end
+	args = updated_args
+
   local on, level, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
   local length, channel
 
@@ -55,17 +66,7 @@ function Vox:play(args)
   val = negharm and (7 - scale[ix]) % 12 or scale[ix]
   note = val + transpose + (octave * 12)
 
-  return on and synth(note, level, length, channel)
-end
-
-function Vox.update(data)
-  local updated = {}
-  for k, v in pairs(data) do
-    updated[k] = type(v) == 'function' or sequins.is_sequins(v)
-      and data[k]()
-      or data[k]
-  end
-  return updated
+  return not nul and on and synth(note, level, length, channel)
 end
 
 function Vox.apply_mask(degree, scale, mask)
@@ -77,34 +78,6 @@ function Vox.apply_mask(degree, scale, mask)
   local degree = closest_val - 1
   return degree
 end
-
--- *****
--- function Vox:new_seq(args)
---   args = args == nil and {} or args
---   args.id = args.id == nil and #self.s + 1 or args.id
-
---   args.action = type(args.action) == 'function' and args.action
---     or args.action and function(val) return self:play{degree = val} end -- build a play_voice fn or similar
-
---   self.s[args.id] = seq:new(args)
--- end
-
--- function Vox:play_seq(id)
---   if id == nil then
---     for k, v in pairs(self.s) do
---       local play = self.s[k].action and self.s[k]:play()
---     end
---   else
---     return self.s[id]:play()
---   end
--- end
-
--- function Vox:reset()
---   for k, v in pairs(self.seq) do
---     self.s[k]:reset()
---   end
--- end
--- *****
 
 function Vox.set(objects, property, val)
   for k, v in pairs(objects) do

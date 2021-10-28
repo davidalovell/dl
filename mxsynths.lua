@@ -15,6 +15,7 @@ engine.name = 'PolyPerc'
 music = require('musicutil')
 vox = include('lib/vox')
 seq = include('lib/seq')
+skip = include('lib/skip')
 s = include('lib/sequins_dl')
 
 -- music helper fn
