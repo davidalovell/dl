@@ -20,7 +20,7 @@ function Vox:new(args)
   o.channel = args.channel == nil and 1 or args.channel
 
   -- empty tables
-  o.s = args.s == nil and {} or args.s -- contaner for sequencers (sequins)
+  o.s = args.s == nil and {} or args.s -- contaner for sequins
   o.c = args.c == nil and {} or args.c -- container for clock
   o.l = args.l == nil and {} or args.l -- container for lattice
 
@@ -40,6 +40,14 @@ function Vox:play(args)
 		if updated_args[k] == nil then
 		  return
 		end
+		
+		--	-- for use with unaltered sequins
+		--if type(updated_args) == 'table' then
+		--	if updated_args[1] == nil then
+		--		return
+		--	end
+		--end
+		
 	end
 	args = updated_args
 
