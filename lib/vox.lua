@@ -43,7 +43,7 @@ function Vox:play(args)
 		
 		--	-- for use with unaltered sequins
 		--if type(updated_args) == 'table' then
-		--	if updated_args[1] == nil then
+		--	if updated_args[1] == nil then -- sequins returns an empty table so the first index will be negative in this instance
 		--		return
 		--	end
 		--end
