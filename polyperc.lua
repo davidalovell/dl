@@ -5,11 +5,9 @@ function r()
 end
 
 engine.name = 'PolyPerc'
-
 sequins = include('lib/sequins_dl'); s = sequins
+lattice = include('lib/lattice_dl'); l = lattice:new()
 vox = include('lib/vox')
-lattice = include('lattice/lib/lattice')
-
 music = require 'musicutil'
 
 function scale(scale) return music.generate_scale_of_length(0, scale, 7) end
@@ -28,18 +26,24 @@ end
 
 lead = vox:new{
   synth = polyperc,
-  scale = scale('lydian'),
-  s = {
-    degree = s{1,2,3,4,5,6,7,8},
-    sync = s{3,1}
-  },
-  c = {
-    division = 1/8,
-    action = function()
-      clock.sync(lead.s.sync() * lead.c.division)
-      lead:play{degree = lead.s.degree}
-    end
-  }
+  scale = scale('lydian')
 }
 
-lead.clock = clock.run(function() while true do lead.c.action() end end)
+lead.s = {
+    d1 = s{1,5,s{-2,-5,-7,-6}:every(2,1),s{9,13,11,7}:every(2)},
+    d2 = s{1,3,5,7}:every(4,1,0),
+    d3 = s{1,3,5,7,9,11,13}:skip(3,1):step(-1)
+  }
+
+lead.l = l:new_pattern{
+  division = 1/16,
+  swing = 60,
+  action = function()
+    lead:play{degree = lead.s.d1}
+    lead:play{degree = lead.s.d2, octave = 1}
+    lead:play{degree = lead.s.d3, octave = 2}
+  end
+}
+
+
+l:start()

@@ -132,7 +132,7 @@ function S.extend(self, t)
 end
 
 function S._every(self)
-    self.mod = self.mod == nil and 0 or self.mod
+    self.mod = self.mod == nil and 0 or (self.n % self.mod)
     return (self.ix % turtle(self.n)) == self.mod -- *** @DL *** changed so that returns val the first time it is called rather than the last time
 end
 
@@ -146,7 +146,7 @@ function S._count(self)
 end
 
 function S._skip(self) -- *** @DL *** 
-    self.mod = self.mod == nil and 0 or self.mod
+    self.mod = self.mod == nil and 0 or (self.n % self.mod)
     local skip = S._every(self) == false and true or false
     return true, skip
 end
