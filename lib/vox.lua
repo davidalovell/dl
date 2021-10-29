@@ -1,5 +1,4 @@
 local Vox = {}
-local sequins = require('sequins')
 
 function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
@@ -33,7 +32,7 @@ function Vox:play(args)
   
 	local updated_args = {}
 	for k, v in pairs(args) do
-	  if s.is_sequins(v) or type(v) == 'function' then
+	  if sequins.is_sequins(v) or type(v) == 'function' then
 	    updated_args[k] = v()
 	  else
 	    updated_args[k] = v
