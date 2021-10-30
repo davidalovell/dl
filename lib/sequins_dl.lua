@@ -197,4 +197,6 @@ S.__newindex = function(self, ix, v)
 end
 
 
-setmetatable(S,
+setmetatable(S, S)
+
+return S
