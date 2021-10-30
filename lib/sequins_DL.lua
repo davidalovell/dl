@@ -132,8 +132,8 @@ function S.extend(self, t)
 end
 
 function S._every(self)
-    self.mod = self.mod == nil and 0 or (self.n % self.mod)
-    return (self.ix % turtle(self.n)) == self.mod -- *** @DL *** changed so that returns val the first time it is called rather than the last time
+    self.mod = self.mod == nil and 0 or self.mod
+    return (self.ix % turtle(self.n)) == (self.mod % self.n) -- *** @DL *** changed so that returns val the first time it is called rather than the last time
 end
 
 function S._times(self)
@@ -146,11 +146,11 @@ function S._count(self)
 end
 
 function S._skip(self) -- *** @DL *** 
-    self.mod = self.mod == nil and 0 or (self.n % self.mod)
+    self.mod = self.mod == nil and 0 or self.mod
     local skip = S._every(self) == false and true or false
     return true, skip
 end
-
+-- 
 function S.cond(self, p, hold) return S.extend(self, {cond = p, hold = hold}) end -- *** @DL *** added hold argument: if hold == 1 then return index else return nil
 function S.condr(self, p, hold) return S.extend(self, {cond = p, rcond = p, hold = hold}) end
 function S.every(self, n, mod, hold) return S.extend(self, {cond = S._every, n = n, mod = mod, hold = hold}) end -- *** @DL *** mod = 0 is default (ie. last time it is called), mod = 1 is first time

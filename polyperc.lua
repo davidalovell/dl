@@ -23,7 +23,6 @@ function sync(sync, fn)
     )
 end
 
-
 lead = vox:new{
   synth = polyperc,
   scale = scale('lydian')
