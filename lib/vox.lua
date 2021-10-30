@@ -5,17 +5,17 @@ function Vox:new(args)
   local args = args == nil and {} or args
 
   o.on = args.on == nil and true or args.on
-  o.level = args.level == nil and 1 or args.level -- max cc velocity
+  
   o.scale = args.scale == nil and {0,2,4,6,7,9,11} or args.scale -- lydian
   o.transpose = args.transpose == nil and 0 or args.transpose -- C0
   o.degree = args.degree == nil and 1 or args.degree
   o.octave = args.octave == nil and 5 or args.octave -- C5
   o.synth = args.synth == nil and function(note, level, length, channel) return note, level, length, channel end or args.synth
   o.wrap = args.wrap ~= nil and args.wrap or false
-  o.mask = args.mask -- could use snap?
+  o.mask = args.mask -- could use MusicUtil
   o.negharm = args.negharm ~= nil and args.negharm or false
-
-  -- midi specific
+  
+  o.level = args.level == nil and 1 or args.level
   o.length = args.length == nil and 1 or args.length
   o.channel = args.channel == nil and 1 or args.channel
 
@@ -40,14 +40,12 @@ function Vox:play(args)
 		if updated_args[k] == nil then
 		  return
 		end
-		
-		--	-- for use with unaltered sequins
-		--if type(updated_args) == 'table' then
-		--	if updated_args[1] == nil then -- sequins returns an empty table so the first index will be negative in this instance
-		--		return
-		--	end
-		--end
-		
+	  -- -- for use with unaltered sequins
+		-- if type(updated_args) == 'table' then
+		-- 	if updated_args[1] == nil then -- sequins returns an empty table so the first index will be negative in this instance
+		-- 		return
+		-- 	end
+		-- end
 	end
 	args = updated_args
 
@@ -55,7 +53,7 @@ function Vox:play(args)
   local length, channel
 
   on = self.on and (args.on == nil and true or args.on)
-  level = self.level * (args.level == nil and 1 or args.level)
+  
   scale = args.scale == nil and self.scale or args.scale
   transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
   degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
@@ -64,8 +62,8 @@ function Vox:play(args)
   wrap = args.wrap == nil and self.wrap or args.wrap
   mask = args.mask == nil and self.mask or args.mask
   negharm = args.negharm == nil and self.negharm or args.negharm
-
-  -- midi specific
+  
+  level = self.level * (args.level == nil and 1 or args.level)
   length = self.length * (args.length == nil and 1 or args.length)
   channel = args.channel == nil and self.channel or args.channel
 
