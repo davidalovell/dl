@@ -24,25 +24,44 @@ function sync(sync, fn)
 end
 
 lead = vox:new{
+  on = false,
   synth = polyperc,
   scale = scale('lydian')
 }
 
 lead.s = {
-    d1 = s{1,5,s{-2,-5,-7,-6}:every(2,1),s{9,13,11,7}:every(2)},
-    d2 = s{1,3,5,7}:every(4,1,0),
-    d3 = s{1,3,5,7,9,11,13}:skip(3,1):step(-1)
+    d1 = s{1,5,s{-2,-5,-7,-6}:every(2,1),s{9,13,11,7}:every(2)}:every(1,0)
   }
 
 lead.l = l:new_pattern{
   division = 1/16,
-  swing = 60,
+  swing = 50,
   action = function()
     lead:play{degree = lead.s.d1}
-    lead:play{degree = lead.s.d2, octave = 1}
-    lead:play{degree = lead.s.d3, octave = 2}
   end
 }
 
+bass = vox:new{
+  on = true,
+  synth = polyperc,
+  scale = scale('lydian'),
+  octave = 4,
+  degree = 1
+}
+
+bass.s = {
+  deg1 = s{1,3,5,7,9,11,13,14},
+  deg2 = s{5,4,1}:every(4,1,1),
+  div1 = s{1,1,1,1,8},
+  division = 1/32
+}
+
+bass.l = l:new_pattern{
+  swing = 60,
+  action = function()
+    bass.l.division = bass.s.div1() * bass.s.division
+    bass:play{degree = bass.s.deg1() + bass.s.deg2()}
+  end
+}
 
 l:start()

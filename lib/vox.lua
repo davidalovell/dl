@@ -21,7 +21,7 @@ function Vox:new(args)
 
   -- empty tables
   o.s = args.s == nil and {} or args.s -- contaner for sequins
-  o.c = args.c == nil and {} or args.c -- container for clock
+  o.seq = args.seq == nil and {} or args.seq -- container for seq
   o.l = args.l == nil and {} or args.l -- container for lattice
 
   return o
@@ -56,7 +56,8 @@ function Vox:play(args)
   
   scale = args.scale == nil and self.scale or args.scale
   transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
-  degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
+  -- degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
+  degree = (self.degree - 1) + (args.degree == nil and 0 or (args.degree - 1))
   octave = self.octave + (args.octave == nil and 0 or args.octave)
   synth = args.synth == nil and self.synth or args.synth
   wrap = args.wrap == nil and self.wrap or args.wrap

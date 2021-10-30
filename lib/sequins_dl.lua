@@ -2,8 +2,8 @@
 -- nestable tables with sequencing behaviours & control flow
 -- TODO i think ASL can be defined in terms of a sequins...
 
+-- S={}
 local S = {}
-
 function S.new(t)
     -- wrap a table in a sequins with defaults
     local s = { data   = t
@@ -44,9 +44,9 @@ end
 
 function S.next(self)
     local act = self.action
-    local ix = self.ix -- *** @DL *** 
+    local val = self[self.ix] -- *** @DL *** 
     if act.action then
-        return S.do_ctrl(act, ix) -- *** @DL *** 
+        return S.do_ctrl(act, val) -- *** @DL *** 
     else return S.do_step(act) end
 end
 
@@ -77,7 +77,7 @@ end
 ------------------------------
 --- control flow manipulation
 
-function S.do_ctrl(act, ix) -- *** @DL *** modified
+function S.do_ctrl(act, val) -- *** @DL *** modified
     act.ix = act.ix + 1
 
     local cond, skip = act.cond(act)
@@ -90,8 +90,12 @@ function S.do_ctrl(act, ix) -- *** @DL *** modified
         retval, exec = nil, 'skip'
     end
 
-    if act.hold == 1 and retval == nil then
-        retval = ix
+    if retval == nil then 
+        if act.hold == 1 then 
+            retval = val
+        elseif act.hold == 0 then
+            retval = 0
+        end
     end
 
     if act.rcond then
@@ -146,7 +150,6 @@ function S._count(self)
 end
 
 function S._skip(self) -- *** @DL *** 
-    self.mod = self.mod == nil and 0 or self.mod
     local skip = S._every(self) == false and true or false
     return true, skip
 end
