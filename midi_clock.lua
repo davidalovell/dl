@@ -2,7 +2,7 @@
 
 -- reload
 function r()
-  norns.script.load('code/vox_norns/vox_norns.lua')
+  norns.script.load('code/vox_norns/midi_clock.lua')
 end
 
 -- libs
