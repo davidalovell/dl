@@ -27,6 +27,12 @@ function sync(sync, fn)
   return clock.run(function() clock.sync(sync); fn() end)
 end
 
+function reset(object)
+  for k, v in pairs(object.s) do
+    object.s[k]:reset()
+  end
+end
+
 function midi_notes_off()
   for i = 0, 127 do
     m:note_off(i)
@@ -60,7 +66,10 @@ end
 
 function clock.transport.stop()
   l:stop()
-  vox.call({lead1.s}, reset)
+  l:reset()
+  reset(lead1)
+  reset(lead2)
+  reset(bass)
   midi_notes_off()
 end
 
@@ -75,19 +84,76 @@ end
 
 
 lead1 = vox:new{
+  on = true,
   channel = 1,
   synth = midisynth,
   scale = scale('mixolydian')
 }
 
 lead1.s = {
-  degree = s{1,2,3,4,5,6,7,8}
+  degree = s{1,2,3,4,5,6,7,8}:step(3),
+  octave = s{-1,0,1,0,-1},
+  level = s{1,0.4,0.2},
+  division = s{2,1,1,12}
 }
 
-lead.l = l:new_pattern{
-  swing = 60,
-  division = 1/16,
+lead1.l = l:new_pattern{
   action = function(t)
-    lead:play{degree = lead1.s.degree}
+    lead1:play{
+      degree = lead1.s.degree,
+      octave = lead1.s.octave,
+      level = lead1.s.level,
+    }
+    lead1.l:set_division(lead1.division * lead1.s.division())
+  end
+}
+
+
+lead2 = vox:new{
+  on = true,
+  channel = 1,
+  synth = midisynth,
+  scale = scale('mixolydian'),
+  degree = 3
+}
+
+lead2.s = {
+  degree = s{1,2,3,4,5,6,7,8}:step(-1),
+  level = s{1,0.4,0.2}:step(2),
+  octave = s{-1,0,1,0,-1}:step(2),
+  division = s{1,2,3,10,16}:every(2,1,1)
+}
+
+lead2.l = l:new_pattern{
+  action = function(t)
+    lead2:play{
+      degree = lead2.s.degree,
+      octave = lead2.s.octave,
+      level = lead2.s.level,
+    }
+    lead2.l:set_division(lead2.division * lead2.s.division())
+  end
+}
+
+
+bass = vox:new{
+  on = true,
+  channel = 2,
+  synth = midisynth,
+  scale = scale('mixolydian'),
+  octave = 3,
+}
+
+bass.s = {
+  degree = s{1,1,5,s{5,4,7,8}},
+  division = s{1,2,3,10,16}:every(4,1,1)
+}
+
+bass.l = l:new_pattern{
+  action = function()
+    bass:play{
+      degree = bass.s.degree
+    }
+    bass.l:set_division(bass.division * bass.s.division())
   end
 }

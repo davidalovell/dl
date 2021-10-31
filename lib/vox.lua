@@ -19,7 +19,8 @@ function Vox:new(args)
   o.length = args.length == nil and 1 or args.length
   o.channel = args.channel == nil and 1 or args.channel
 
-  -- empty tables
+  -- other
+  o.division = args.division == nil and 1/16 or args.division -- store division setting
   o.s = args.s == nil and {} or args.s -- contaner for sequins
   o.seq = args.seq == nil and {} or args.seq -- container for seq
   o.l = args.l == nil and {} or args.l -- container for lattice
@@ -49,15 +50,15 @@ function Vox:play(args)
 	end
 	args = updated_args
 
-  local on, level, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
-  local length, channel
+  local on, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
+  local level, length, channel
+  -- local division
 
   on = self.on and (args.on == nil and true or args.on)
   
   scale = args.scale == nil and self.scale or args.scale
   transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
-  -- degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
-  degree = (self.degree - 1) + (args.degree == nil and 0 or (args.degree - 1))
+  degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
   octave = self.octave + (args.octave == nil and 0 or args.octave)
   synth = args.synth == nil and self.synth or args.synth
   wrap = args.wrap == nil and self.wrap or args.wrap
@@ -67,6 +68,9 @@ function Vox:play(args)
   level = self.level * (args.level == nil and 1 or args.level)
   length = self.length * (args.length == nil and 1 or args.length)
   channel = args.channel == nil and self.channel or args.channel
+  
+  -- division = args.division == nil and self.division or args.division
+  -- self.division = args.division == nil and self.division or args.division
 
   octave = wrap and octave or octave + math.floor(degree / #scale)
   ix = mask and self.apply_mask(degree, scale, mask) % #scale + 1 or degree % #scale + 1

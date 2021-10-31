@@ -24,9 +24,10 @@ function sync(sync, fn)
 end
 
 lead = vox:new{
-  on = false,
+  on = true,
   synth = polyperc,
-  scale = scale('lydian')
+  scale = scale('lydian'),
+  octave = 4
 }
 
 lead.s = {
@@ -34,7 +35,7 @@ lead.s = {
   }
 
 lead.l = l:new_pattern{
-  division = 1/16,
+  division = 1/8,
   swing = 50,
   action = function()
     lead:play{degree = lead.s.d1}
@@ -52,7 +53,7 @@ bass = vox:new{
 bass.s = {
   deg1 = s{1,3,5,7,9,11,13,14},
   deg2 = s{5,4,1}:every(4,1,1),
-  div1 = s{1,1,1,1,8},
+  div1 = s{1,1,1,1,6,2},
   division = 1/32
 }
 
