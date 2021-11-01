@@ -19,6 +19,14 @@ m = midi.connect()
 
 
 
+triad = { {1,3,5}, {2,4,6}, {3,5,7}, {4,6,8}, {5,7,9}, {6,8,10}, {7,9,11} }
+
+
+
+
+
+
+
 function scale(scale)
   return music.generate_scale_of_length(0, scale, 7)
 end
@@ -157,3 +165,38 @@ bass.l = l:new_pattern{
     bass.l:set_division(bass.division * bass.s.division())
   end
 }
+
+
+
+function part2()
+  clock.run(
+    function()
+      clock.sync(4)
+
+      lead1.level = 1
+    
+      lead1.s = {
+        degree = s{1,s{2,4,1,4},5,7,s{9,11,13,8},8},
+        octave = s{0,-1,0,1},
+        level = s{1,0.4,0.2},
+        division = s{4,1,1,2}
+      }
+
+      lead2.level = 0.7
+      lead2.division = 1/32
+      lead2.octave = 4
+
+      lead2.s = {
+        degree = s{1,s{4,3},5,s{6,11},7,8,s{13,11}},
+        division = s{16,2,1,3,1,9,16}:every(2,1,1)
+      }
+
+      bass.s = {
+        degree = s{1,1,s{7,11},9,s{8}:every(2),5},
+        division = s{14,2,3,7,2,4}:every(2,1,1)
+      }
+    end
+  )
+end
+
+
