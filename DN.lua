@@ -1,4 +1,7 @@
--- norns.script.load('code/vox_norns/DN.lua')
+function reload()
+  norns.script.load('code/vox_norns/DN.lua')
+end
+
 function r() norns.script.load(norns.script.state) end
 
 
@@ -79,14 +82,26 @@ bass = vox:new{
 }
 
 bass.s = {
+  f1 = s{1,1,5,5,3,3,4,4}:every(5,1),
+  f2 = s{1,1,5,5,3,3,4,4}:every(5,2),
   degree = s{1,1,5,s{5,4,7,8},s{7,8,4}},
-  division = s{1,1,2,4,8}
+  division = s{1,1,2,4,8},
+  level = s{1,1,0.5,0.5,0.5}
 }
 
 bass.l = l:new_pattern{
   action = function()
+    -- local f1 = bass.s.f1()
+    -- local f2 = bass.s.f2()
+    -- local d = bass.s.degree()
+    -- print(f1,f2,d)
+
+    -- if f1 then d = f1 end
+    -- if f2 then d = f2 end
+
     bass:play{
-      degree = bass.s.degree
+      degree = bass.s.degree,
+      level = bass.s.level
     }
     bass.l:set_division(bass.division * bass.s.division())
   end
@@ -98,42 +113,50 @@ lead = vox:new{
   channel = 2,
   synth = midisynth,
   scale = scale('dorian'),
-  division = 1/16
+  division = 1/16,
+  octave = 7
 }
 
 lead.s = {
   degree =   s{1,3,4,5,7,8,7,6,4},
-  division = s{1,1,1,1,1,1,2,4,8} 
+  division = s{1,1,1,1,1,1,2,4,8,8},
+  octave = s{0,1,0,-1}
 }
 
 lead.l = l:new_pattern{
   action = function()
     lead:play{
-      degree = lead.s.degree
+      degree = lead.s.degree,
+      octave = lead.s.octave
     }
     lead.l:set_division(lead.division * lead.s.division())
   end
 }
 
-harm = vox:new{
+chord = vox:new{
   on = true,
-  channel = 2,
+  channel = 3,
+  octave = 4,
   synth = midisynth,
   scale = scale('dorian'),
-  degree = 8,
   division = 1/16
 }
 
-harm.s = {
-  degree =   s{1,5,3,7,9}, --dont like much
-  division = s{4,2} 
+chord.s = {
+  degree = s{1,3,4,1}:every(2,1,1),
+  d2 = s{5,7,6,5}:every(2,1,1),
+  division = s{16} 
 }
 
-harm.l = l:new_pattern{
+chord.l = l:new_pattern{
   action = function()
-    lead:play{
-      degree = harm.s.degree -- vox bug, doesn't add to existing degree
+
+    chord:play{
+      degree = chord.s.degree
     }
-    harm.l:set_division(harm.division * harm.s.division())
+    chord:play{
+      degree = chord.s.d2
+    }
+    chord.l:set_division(chord.division * chord.s.division())
   end
 }
