@@ -33,7 +33,7 @@ end
 function Vox:play(args)
   local args = args == nil and {} or self.update(args)
   local on, level, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
-  local length, channel
+  local length, channel, midi_device
 
   on = self.on and (args.on == nil and true or args.on)
   level = self.level * (args.level == nil and 1 or args.level)
