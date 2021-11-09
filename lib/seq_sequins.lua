@@ -1,11 +1,17 @@
--- local Seq = {}
+-- the idea here is to build wrapper for standard sequins
+-- so it can skip, divide etc 
+-- this is currently very empryonic and based on seq
+
+-- local 
 Seq = {}
--- local sequins = require 'sequins_dl'
+-- local
 sequins = require 'sequins_dl'
 
 function Seq:new(args)
   local o = setmetatable( {}, {__index = Seq} )
   local args = args == nil and {} or args
+
+  o.s = args.s == nil and sequins{1,2,3,4} or args.s
 
   o.seq = args.seq == nil and {1} or args.seq
   o.div = args.div == nil and 1 or args.div
@@ -46,9 +52,12 @@ function Seq:play(args)
 	end
 	args = updated_args
 
+  local s
   local seq, div, step, skip, prob
   local next
   
+  s = args.s == nil and self.s or args.s
+
   seq = args.seq == nil and self.seq or args.seq
   div = self.div * (args.div == nil and 1 or args.div)
   step = self.step * (args.step == nil and 1 or args.step)
@@ -66,11 +75,19 @@ function Seq:play(args)
     or self.step_count
 
   next = (self.offset_count - 1) % skip == 0 and prob >= math.random()
-  self.ix = next and self.step_count or self.ix
+  -- self.ix = next and self.step_count or self.ix
+
+  if next then
+    return self.s()
+  else
+    return self.s[self.s.ix]
+  end
+
+
 	
-  return next and self.offset_count >= 1 and self.div_count == 1 and self.action ~= nil
-    and self.action(seq[self.ix])
-    or seq[self.ix] --or 0
+  -- return next and self.offset_count >= 1 and self.div_count == 1 and self.action ~= nil
+  --   and self.action(seq[self.ix])
+  --   or seq[self.ix] --or 0
 end
 
 function Seq:reset()
