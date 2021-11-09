@@ -1,5 +1,5 @@
 function reload()
-  norns.script.load('code/vox_norns/DN.lua')
+  norns.script.load('code/vox_norns/gairloch.lua')
 end
 
 function r() norns.script.load(norns.script.state) end
@@ -50,6 +50,35 @@ end
 
 
 
+m.event = function(data)
+  local msg = midi.to_msg(data)
+  if msg.type == 'cc' then
+    print(msg.cc, msg.val)
+    if msg.cc == 70 then
+
+      lead.degree = math.floor(msg.val)
+    end
+
+    -- if msg.cc == 70 then
+    --   bass.division = 1/msg.val
+    -- elseif msg.cc == 71 then
+    --   lead.division = 1/msg.val
+    -- end
+    -- if msg.cc == 70 and msg.val < 10 then
+    --   sync(4, part1)
+    -- elseif msg.cc == 70 and msg.val >= 10 and msg.val < 20 then
+    --   sync(4, part2)
+    -- end
+  elseif msg.type == 'note_on' then
+    for k,v in pairs(msg) do
+      print(k,v)
+    end
+  end
+  
+end
+
+
+
 
 function clock.transport.start()
   l:start()
@@ -60,7 +89,8 @@ function clock.transport.stop()
   l:reset()
   reset(bass)
   reset(lead)
-  reset(harm)
+  reset(chord)
+  reset(hh)
   midi_notes_off()
 end
 
@@ -91,14 +121,6 @@ bass.s = {
 
 bass.l = l:new_pattern{
   action = function()
-    -- local f1 = bass.s.f1()
-    -- local f2 = bass.s.f2()
-    -- local d = bass.s.degree()
-    -- print(f1,f2,d)
-
-    -- if f1 then d = f1 end
-    -- if f2 then d = f2 end
-
     bass:play{
       degree = bass.s.degree,
       level = bass.s.level
@@ -118,7 +140,7 @@ lead = vox:new{
 }
 
 lead.s = {
-  degree =   s{1,3,4,5,7,8,7,6,4},
+  degree = s{1,3,4,5,7,8,7,6,4},
   division = s{1,1,1,1,1,1,2,4,8,8},
   octave = s{0,1,0,-1}
 }
@@ -137,22 +159,22 @@ chord = vox:new{
   on = true,
   channel = 3,
   octave = 4,
+  length = 4,
   synth = midisynth,
   scale = scale('dorian'),
   division = 1/16
 }
 
 chord.s = {
-  degree = s{1,3,4,1}:every(2,1,1),
-  d2 = s{5,7,6,5}:every(2,1,1),
+  d1 = s{1,3,4,1}:every(2,1),
+  d2 = s{5,7,6,5}:every(2,1),
   division = s{16} 
 }
 
 chord.l = l:new_pattern{
   action = function()
-
     chord:play{
-      degree = chord.s.degree
+      degree = chord.s.d1
     }
     chord:play{
       degree = chord.s.d2
@@ -160,3 +182,80 @@ chord.l = l:new_pattern{
     chord.l:set_division(chord.division * chord.s.division())
   end
 }
+
+hh = vox:new{
+  on = true,
+  channel = 4,
+  synth = midisynth,
+  scale = scale('dorian')
+}
+
+hh.s = {
+  division = s{1},
+  d1 = s{1}:every(8,3),
+  d2 = s{1}:every(8,6),
+  d3 = s{1}:every(16,16),
+  d4 = s{1}:every(64,61),
+  level = s{1,0.5,0.2}
+}
+
+hh.l = l:new_pattern{
+  action = function()
+    hh:play{degree = hh.s.d1, level = hh.s.level}
+    hh:play{degree = hh.s.d2, level = hh.s.level}
+    hh:play{degree = hh.s.d3, level = hh.s.level}
+    hh:play{degree = hh.s.d4, level = hh.s.level}
+    hh.l:set_division(hh.division * hh.s.division())
+  end
+}
+
+
+function part1()
+  bass.s = {
+    f1 = s{1,1,5,5,3,3,4,4}:every(5,1),
+    f2 = s{1,1,5,5,3,3,4,4}:every(5,2),
+    degree = s{1,1,5,s{5,4,7,8},s{7,8,4}},
+    division = s{1,1,2,4,8},
+    level = s{1,1,0.5,0.5,0.5}
+  }
+
+  lead.on = true
+  lead.s = {
+    degree = s{1,3,4,5,7,8,7,6,4},
+    division = s{1,1,1,1,1,1,2,4,8,8},
+    octave = s{0,1,0,-1}
+  }
+
+  chord.on = true
+  chord.s = {
+    d1 = s{1,3,4,1}:every(2,1),
+    d2 = s{5,7,6,5}:every(2,1),
+    division = s{16} 
+  }
+
+  hh.on = true
+  hh.s = {
+    division = s{1},
+    d1 = s{1}:every(8,3),
+    d2 = s{1}:every(8,6),
+    d3 = s{1}:every(16,16),
+    d4 = s{1}:every(64,61),
+    level = s{1,0.5,0.2}
+  }
+end
+
+function part2()
+  bass.on = true
+  lead.on = false
+  chord.on = false
+  hh.on = true
+
+  bass.s.degree = s{1}
+end
+
+
+function part3()
+end
+
+function part4()
+end

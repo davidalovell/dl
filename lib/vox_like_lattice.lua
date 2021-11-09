@@ -1,8 +1,10 @@
 --[[local]] Vox, Voice = {}, {}
 
-function r()
-  norns.script.load('code/vox_norns/lib/v.lua')
+function reload()
+  norns.script.load('code/vox_norns/lib/vox_like_lattice.lua')
 end
+
+function r() norns.script.load(norns.script.state) end
 
 function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
@@ -30,6 +32,9 @@ function Vox:new_voice(args)
   self.id_count = self.id_count + 1
   local args = args == nil and {} or args
   args.id = self.id_count
+
+
+  
     -- WORK HERE
   args.action = args.action == nil and function(t) return end or args.action
   args.division = args.division == nil and 1/4 or args.division
