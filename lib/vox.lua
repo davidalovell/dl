@@ -30,24 +30,20 @@ end
 
 function Vox:play(args)
   local args = args == nil and {} or args
-  
 	local updated_args = {}
+
 	for k, v in pairs(args) do
 	  if sequins.is_sequins(v) or type(v) == 'function' then
 	    updated_args[k] = v()
 	  else
 	    updated_args[k] = v
 	  end
+    
 		if updated_args[k] == nil then
 		  return
 		end
-	  -- -- for use with unaltered sequins
-		-- if type(updated_args) == 'table' then
-		-- 	if updated_args[1] == nil then -- sequins returns an empty table so the first index will be negative in this instance
-		-- 		return
-		-- 	end
-		-- end
 	end
+
 	args = updated_args
 
   local on, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
