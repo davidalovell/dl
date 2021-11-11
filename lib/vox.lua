@@ -1,18 +1,18 @@
 local Vox = {}
+local sequins = require('sequins'); s = sequins
 
 function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
   local args = args == nil and {} or args
 
   o.on = args.on == nil and true or args.on
-  
   o.scale = args.scale == nil and {0,2,4,6,7,9,11} or args.scale -- lydian
   o.transpose = args.transpose == nil and 0 or args.transpose -- C0
   o.degree = args.degree == nil and 1 or args.degree
   o.octave = args.octave == nil and 5 or args.octave -- C5
   o.synth = args.synth == nil and function(note, level, length, channel) return note, level, length, channel end or args.synth
   o.wrap = args.wrap ~= nil and args.wrap or false
-  o.mask = args.mask -- could use MusicUtil
+  o.mask = args.mask -- could use MusicUtil instead
   o.negharm = args.negharm ~= nil and args.negharm or false
   
   o.level = args.level == nil and 1 or args.level
@@ -20,9 +20,9 @@ function Vox:new(args)
   o.channel = args.channel == nil and 1 or args.channel
 
   -- other
-  o.division = args.division == nil and 1/16 or args.division -- store division setting
-  o.s = args.s == nil and {} or args.s -- contaner for sequins
+  o.division = args.division == nil and 1/16 or args.division -- store division setting -- NO LONGER NEEDED
   o.seq = args.seq == nil and {} or args.seq -- container for seq
+  o.s = args.s == nil and {} or args.s -- contaner for sequins
   o.l = args.l == nil and {} or args.l -- container for lattice
 
   return o
@@ -38,7 +38,7 @@ function Vox:play(args)
 	  else
 	    updated_args[k] = v
 	  end
-    
+
 		if updated_args[k] == nil then
 		  return
 		end
@@ -48,7 +48,6 @@ function Vox:play(args)
 
   local on, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
   local level, length, channel
-  -- local division
 
   on = self.on and (args.on == nil and true or args.on)
   
@@ -64,16 +63,13 @@ function Vox:play(args)
   level = self.level * (args.level == nil and 1 or args.level)
   length = self.length * (args.length == nil and 1 or args.length)
   channel = args.channel == nil and self.channel or args.channel
-  
-  -- division = args.division == nil and self.division or args.division
-  -- self.division = args.division == nil and self.division or args.division
 
   octave = wrap and octave or octave + math.floor(degree / #scale)
   ix = mask and self.apply_mask(degree, scale, mask) % #scale + 1 or degree % #scale + 1
   val = negharm and (7 - scale[ix]) % 12 or scale[ix]
   note = val + transpose + (octave * 12)
 
-  return not nul and on and synth(note, level, length, channel)
+  return on and synth(note, level, length, channel)
 end
 
 function Vox.apply_mask(degree, scale, mask)

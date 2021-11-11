@@ -1,9 +1,8 @@
 -- seqwrap is a wrapper for sequins
--- allows division, skip, mod (i.e. which 'beat' div or skip occur), hold (allows for ratcheting), probability
+-- allows division, skip, beat (i.e. which 'beat' division or skip occurs), hold (allows for ratcheting), probability that a note will return (sequins will advance)
 
 local Seq = {}
-Seq = {}
-sequins = require('sequins'); s = sequins
+local sequins = require('sequins'); s = sequins
 
 function Seq:new(args)
   local o = setmetatable( {}, {__index = Seq} )
@@ -14,7 +13,7 @@ function Seq:new(args)
 
   o.div = args.div == nil and 1 or args.div
   o.skip = args.skip == nil and 1 or args.skip
-  o.mod = args.mod == nil and 1 or args.mod
+  o.beat = args.beat == nil and 1 or args.beat
   o.prob = args.prob == nil and 1 or args.prob
   o.hold = args.hold == nil and false or args.hold
 
@@ -43,7 +42,7 @@ function Seq:play(args)
 		  return
 		end
 	end
-  
+
 	args = updated_args
 
   local seq = args.seq == nil and self.seq or args.seq; self.s:settable(seq)
@@ -51,7 +50,7 @@ function Seq:play(args)
 
   local div = self.div * (args.div == nil and 1 or args.div)
   local skip = args.skip == nil and self.skip or args.skip
-  local mod = args.mod == nil and self.mod or args.mod
+  local beat = args.beat == nil and self.beat or args.beat
   local prob = args.prob == nil and self.prob or args.prob
   local hold = args.hold == nil and self.hold or args.hold
   local held
@@ -59,14 +58,14 @@ function Seq:play(args)
   self.count = self.count + 1
 
   if self.count >= 1 then
-    if self.count % div == mod % div then
+    if self.count % div == beat % div then
       held = false
       self.val = self.s()
     else
       held = true
       self.val = self.s[self.s.ix]
     end
-    if self.count % (skip * div) == mod % (skip * div) and prob >= math.random() then
+    if self.count % (skip * div) == beat % (skip * div) and prob >= math.random() then
       held = false
       self.last = self.val
     else
