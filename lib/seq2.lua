@@ -56,7 +56,7 @@ function Seq:play(args)
 	args = updated_args
 
   local seq, div, step, skip, prob
-  local mod, mod, hold
+  local mod, hold
   local held
   
   seq = args.seq == nil and self.seq or args.seq; self.s:settable(seq)
@@ -91,7 +91,7 @@ function Seq:play(args)
     self.val = nil
   end
   
-  if self.action ~= nil then 
+  if self.action then 
     return self.action(self.val)
   else
     return self.val
