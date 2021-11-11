@@ -88,7 +88,8 @@ function Seq:play(args)
   end
 
   if not hold and held then
-    self.val = nil
+    -- self.val = nil
+    return
   end
   
   if self.action then 
