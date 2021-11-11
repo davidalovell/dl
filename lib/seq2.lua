@@ -6,7 +6,8 @@ function Seq:new(args)
   local o = setmetatable( {}, {__index = Seq} )
   local args = args == nil and {} or args
 
-  o.s = args.s == nil and s{1,2,3,4,5,6,7} or s(args.s)
+  o.seq = args.seq == nil and {1,2,3,4,5,6,7} or args.s
+  o.s = s(o.seq)
   o.div = args.div == nil and 1 or args.div
   o.step = args.step == nil and 1 or args.step
   o.skip = args.skip == nil and 1 or args.skip
@@ -36,13 +37,15 @@ function Seq:play(args)
 	    updated_args[k] = v
 	  end
 
+    -- for use for functions that return nil
     -- for use with ALTERED sequins if you want to use the 'nested methods' out with nested sequins
     if updated_args[k] == nil then
 		  return
 		end
 
 	  -- -- for use with UNALTERED sequins if you want to use the 'nested methods' out with nested sequins
-		-- if type(updated_args) == 'table' then
+		-- -- untested
+    -- if type(updated_args) == 'table' then
 		-- 	if updated_args[1] == nil then -- sequins returns an empty table so the first index will be nil in this instance
 		-- 		return
 		-- 	end
@@ -52,9 +55,11 @@ function Seq:play(args)
 
 	args = updated_args
 
-  local div, step, skip, prob
+  local seq, div, step, skip, prob
   local mod, mod, hold
+  local held
   
+  seq = args.seq == nil and self.seq or args.seq; self.s:settable(seq)
   div = self.div * (args.div == nil and 1 or args.div)
   step = args.step == nil and self.step or args.step; self.s:step(step)
   skip = args.skip == nil and self.skip or args.skip
@@ -65,27 +70,32 @@ function Seq:play(args)
 
   self.count = self.count + 1
 
-  -- clean up nested ifs, have a single return
-  if self.count >=1 then
+  if self.count >= 1  then
     if self.count % div == mod % div then
+      held = false
       self.val = self.s()
     else
+      held = true
       self.val = self.s[self.s.ix]
-      if not hold then
-        return
-      end
     end
-    if self.count % skip == mod % skip and prob >= math.random() then
+    if self.count % (skip * div) == mod % (skip * div) and prob >= math.random() then
+      held = false
       self.last = self.val
-      return self.val
     else
-      if not hold then 
-        return
-      end
-      return self.last
+      held = true
+      self.val = self.last
     end
   end
-  -- need to somehow incorporate the action here
+
+  if not hold and held then
+    self.val = nil
+  end
+  
+  if self.action ~= nil then 
+    return self.action(self.val)
+  else
+    return self.val
+  end
 
 end
 
