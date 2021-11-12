@@ -57,6 +57,10 @@ function Seq:play(args)
 
   self.count = self.count + 1
 
+  -- if self.count < 1 then
+  --   return
+  -- end
+  
   if self.count >= 1 then
     if self.count % div == beat % div then
       held = false
