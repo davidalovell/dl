@@ -8,10 +8,11 @@ function Vox:new(args)
 
   o.on = args.on == nil and true or args.on
   o.scale = args.scale == nil and {0,2,4,6,7,9,11} or args.scale -- lydian
-  o.transpose = args.transpose == nil and 0 or args.transpose -- C0
+  -- TODO either table or string
+  o.transpose = args.transpose == nil and 0 or args.transpose
   o.degree = args.degree == nil and 1 or args.degree
   o.octave = args.octave == nil and 5 or args.octave -- C5
-  o.synth = args.synth == nil and function(note, level, length, channel, tab1) return note, level, length, channel, tab1 end or args.synth
+  o.synth = args.synth == nil and function(self, args) return args.note end or args.synth
   o.wrap = args.wrap ~= nil and args.wrap or false
   o.mask = args.mask -- could use MusicUtil instead
   o.negharm = args.negharm ~= nil and args.negharm or false
@@ -19,9 +20,9 @@ function Vox:new(args)
   o.level = args.level == nil and 1 or args.level
   o.length = args.length == nil and 1 or args.length
   o.channel = args.channel == nil and 1 or args.channel
+  o.device = args.device == nil and midi.connect(1) or args.device
   o.user = args.user == nil and {} or args.user
 
-  -- other
   o.s = args.s == nil and {} or args.s -- contaner for sequins
   o.l = args.l == nil and {} or args.l -- container for lattice
   o.seq = args.seq == nil and {} or args.seq -- container for seq
@@ -47,37 +48,38 @@ function Vox:play(args)
 
 	args = updated_args
 
-  -- TODO switch from local variables to args.var
-  local on = self.on and (args.on == nil and true or args.on)
+  args.on = self.on and (args.on == nil and true or args.on)
   
-  local scale = args.scale == nil and self.scale or args.scale
-  local transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
-  local degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
-  local octave = self.octave + (args.octave == nil and 0 or args.octave)
-  local synth = args.synth == nil and self.synth or args.synth
-  local wrap = args.wrap == nil and self.wrap or args.wrap
-  local mask = args.mask == nil and self.mask or args.mask
-  local negharm = args.negharm == nil and self.negharm or args.negharm
+  args.scale = args.scale == nil and self.scale or args.scale
+  args.transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
+  args.degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
+  args.octave = self.octave + (args.octave == nil and 0 or args.octave)
+  args.synth = args.synth == nil and self.synth or args.synth
+  args.wrap = args.wrap == nil and self.wrap or args.wrap
+  args.mask = args.mask == nil and self.mask or args.mask
+  args.negharm = args.negharm == nil and self.negharm or args.negharm
   
-  local level = self.level * (args.level == nil and 1 or args.level)
-  local length = self.length * (args.length == nil and 1 or args.length)
-  local channel = args.channel == nil and self.channel or args.channel
-  local user = self.user == nil and self.user or args.user
+  args.level = math.ceil(self.level * (args.level == nil and 1 or args.level) * 127)
+  args.length = self.length * (args.length == nil and 1 or args.length)
+  args.channel = args.channel == nil and self.channel or args.channel
+  args.device = args.device == nil and self.device or args.device
+  args.user = self.user == nil and self.user or args.user
 
-  octave = wrap and octave or octave + math.floor(degree / #scale)
-  local ix = mask and self.apply_mask(degree, scale, mask) % #scale + 1 or degree % #scale + 1
+  -- TODO make this into some if statements for ease of reading
+  args.octave = args.wrap and args.octave or args.octave + math.floor(args.degree / #args.scale)
+  args.ix = args.mask and self.apply_mask(args.degree, args.scale, args.mask) % #args.scale + 1 or args.degree % #args.scale + 1
   -- TODO apply musicutil snap to note here
-  -- ix = degree % #scale + 1
-  local val = negharm and (7 - scale[ix]) % 12 or scale[ix]
-  local note = val + transpose + (octave * 12)
+  args.val = args.negharm and (7 - args.scale[args.ix]) % 12 or args.scale[args.ix]
+  args.note = args.val + args.transpose + (args.octave * 12)
 
-  return on and synth(note, level, length, channel, user)
+  return args.on and args.synth(self, args)
 end
 
 -- TODO, function that creates sequins
 -- TODO, function that creates seq
 
 function Vox:reset()
+  -- TODO some error handling
   for k, v in pairs(self.s) do
     self.s[k]:reset() -- reset sequins
   end

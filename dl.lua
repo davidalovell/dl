@@ -14,22 +14,10 @@ function sync(sync, fn)
   return clock.run(function() clock.sync(sync); fn() end)
 end
 
-function midi_notes_off()
+function midi_notes_off(device)
   for i = 0, 127 do
-    m:note_off(i)
+    device:note_off(i)
   end
-end
-
-function midisynth(note, level, length, channel, user)
-  print(user.test)
-  level = math.ceil(level * 127)
-  clock.run(
-    function()
-      m:note_on(note, level, channel)
-      clock.sync(length)
-      m:note_off(note, level, channel)
-    end
-  )
 end
 
 
@@ -56,7 +44,7 @@ function clock.transport.stop()
   l:stop()
   l:reset() -- ?put this inside vox
   vox.call(voices, 'reset')
-  midi_notes_off()
+  midi_notes_off(m)
 end
 
 
@@ -70,14 +58,30 @@ end
 bass = vox:new{
   on = true,
   channel = 1,
-  synth = midisynth,
   scale = vox.apply_scale('lydian'),
   octave = 4,
-  length = 0.1
+  length = 1/4
 }
 
+bass.user = {
+  cutoff = 0.5
+}
+
+bass.synth = function(self, args)
+  args.user.cutoff = math.ceil(self.user.cutoff * args.user.cutoff() * 127)
+  clock.run(
+    function()
+      args.device:cc(23, args.user.cutoff, args.channel)
+      args.device:note_on(args.note, args.level, args.channel)
+      clock.sync(args.length)
+      args.device:note_off(args.note, args.level, args.channel)
+    end
+  )
+end
+
 bass.s = {
-  div = s{4,4,4,1,1,2}
+  div = s{4,4,4,1,1,2},
+  cutoff = s{0.9,0.7,0.5,0.7,0.6}
 }
 
 bass.l = l:new_pattern{
@@ -89,9 +93,9 @@ bass.l = l:new_pattern{
 
 bass.seq = seq:new{
   div = 2,
-  seq = {1,3,5,s{7,9,4,11}},
+  seq = {1,4,5,s{7,9,6,11}},
   action = function(val)
-    bass:play{degree = val, user = {test = 'success!'}}
+    bass:play{degree = val, user = {cutoff = bass.s.cutoff}}
   end
 }
 
