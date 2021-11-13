@@ -1,5 +1,6 @@
 local Vox = {}
 local sequins = require('sequins'); s = sequins
+local musicutil = require('musicutil')
 
 function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
@@ -66,10 +67,25 @@ function Vox:play(args)
 
   octave = wrap and octave or octave + math.floor(degree / #scale)
   ix = mask and self.apply_mask(degree, scale, mask) % #scale + 1 or degree % #scale + 1
+  -- ix = degree % #scale + 1
   val = negharm and (7 - scale[ix]) % 12 or scale[ix]
   note = val + transpose + (octave * 12)
 
   return on and synth(note, level, length, channel)
+end
+
+function Vox:reset()
+  -- reset sequins
+  for k, v in pairs(self.s) do
+    self.s[k]:reset()
+  end
+
+  -- reset seq
+  self.seq:reset()
+end
+
+function Vox.apply_scale(scale)
+  return musicutil.generate_scale_of_length(0, scale, 7)
 end
 
 function Vox.apply_mask(degree, scale, mask)
