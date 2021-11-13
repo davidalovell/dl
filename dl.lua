@@ -67,11 +67,12 @@ bass.user = {
   cutoff = 0.5
 }
 
+-- TODO incorporate this into vox
 bass.synth = function(self, args)
   args.user.cutoff = math.ceil(self.user.cutoff * args.user.cutoff() * 127)
+  args.device:cc(23, args.user.cutoff, args.channel)
   clock.run(
     function()
-      args.device:cc(23, args.user.cutoff, args.channel)
       args.device:note_on(args.note, args.level, args.channel)
       clock.sync(args.length)
       args.device:note_off(args.note, args.level, args.channel)
