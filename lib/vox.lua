@@ -75,13 +75,11 @@ function Vox:play(args)
 end
 
 function Vox:reset()
-  -- reset sequins
   for k, v in pairs(self.s) do
-    self.s[k]:reset()
+    self.s[k]:reset() -- reset sequins
   end
 
-  -- reset seq
-  self.seq:reset()
+  self.seq:reset() -- reset seq
 end
 
 function Vox.apply_scale(scale)

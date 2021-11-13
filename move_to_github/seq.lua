@@ -1,5 +1,5 @@
--- local Seq = {}
-Seq = {}
+local Seq = {}
+-- Seq = {}
 -- local sequins = require 'sequins_dl'
 sequins = require 'sequins_dl'
 
@@ -80,4 +80,4 @@ function Seq:reset()
   self.ix = 1
 end
 
--- return Seq
+return Seq

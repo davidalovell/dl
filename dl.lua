@@ -1,17 +1,14 @@
 function reload()
-  norns.script.load('code/V/V.lua')
+  norns.script.load('code/dl/dl.lua')
 end
 
 function r() norns.script.load(norns.script.state) end
 
-sequins = include('lib/sequins'); s = sequins
-lattice = include('lib/lattice_dl'); l = lattice:new()
+sequins = require('sequins'); s = sequins
+lattice = include('lib/lattice_1.2'); l = lattice:new()
 vox = include('lib/vox')
 seq = include('lib/seq')
-music = require('musicutil')
-
-DN = midi.connect(1)
-m = DN
+m = midi.connect(1)
 
 function sync(sync, fn)
   return clock.run(function() clock.sync(sync); fn() end)
@@ -39,32 +36,15 @@ end
 
 
 
--- m.event = function(data)
---   local msg = midi.to_msg(data)
---   if msg.type == 'cc' then
---     print(msg.cc, msg.val)
---     if msg.cc == 70 then
-
---       lead.degree = math.floor(msg.val)
---     end
-
---     -- if msg.cc == 70 then
---     --   bass.division = 1/msg.val
---     -- elseif msg.cc == 71 then
---     --   lead.division = 1/msg.val
---     -- end
---     -- if msg.cc == 70 and msg.val < 10 then
---     --   sync(4, part1)
---     -- elseif msg.cc == 70 and msg.val >= 10 and msg.val < 20 then
---     --   sync(4, part2)
---     -- end
---   elseif msg.type == 'note_on' then
---     for k,v in pairs(msg) do
---       print(k,v)
---     end
---   end
-  
--- end
+m.event = function(data)
+  local msg = midi.to_msg(data)
+  if msg.type == 'cc' then
+    print(msg.cc, msg.val)
+    -- if msg.cc == 70 then
+    --   bass.seq.skip = math.floor(msg.val) + 1
+    -- end
+  end
+end
 
 
 
