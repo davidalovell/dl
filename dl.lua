@@ -20,7 +20,8 @@ function midi_notes_off()
   end
 end
 
-function midisynth(note, level, length, channel)
+function midisynth(note, level, length, channel, user)
+  print(user.test)
   level = math.ceil(level * 127)
   clock.run(
     function()
@@ -30,8 +31,6 @@ function midisynth(note, level, length, channel)
     end
   )
 end
-
-
 
 
 
@@ -92,7 +91,7 @@ bass.seq = seq:new{
   div = 2,
   seq = {1,3,5,s{7,9,4,11}},
   action = function(val)
-    bass:play{degree = val}
+    bass:play{degree = val, user = {test = 'success!'}}
   end
 }
 

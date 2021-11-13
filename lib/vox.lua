@@ -11,7 +11,7 @@ function Vox:new(args)
   o.transpose = args.transpose == nil and 0 or args.transpose -- C0
   o.degree = args.degree == nil and 1 or args.degree
   o.octave = args.octave == nil and 5 or args.octave -- C5
-  o.synth = args.synth == nil and function(note, level, length, channel) return note, level, length, channel end or args.synth
+  o.synth = args.synth == nil and function(note, level, length, channel, tab1) return note, level, length, channel, tab1 end or args.synth
   o.wrap = args.wrap ~= nil and args.wrap or false
   o.mask = args.mask -- could use MusicUtil instead
   o.negharm = args.negharm ~= nil and args.negharm or false
@@ -19,6 +19,7 @@ function Vox:new(args)
   o.level = args.level == nil and 1 or args.level
   o.length = args.length == nil and 1 or args.length
   o.channel = args.channel == nil and 1 or args.channel
+  o.user = args.user == nil and {} or args.user
 
   -- other
   o.s = args.s == nil and {} or args.s -- contaner for sequins
@@ -46,33 +47,31 @@ function Vox:play(args)
 
 	args = updated_args
 
-  local on, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
-  local level, length, channel
-
-  on = self.on and (args.on == nil and true or args.on)
+  -- TODO switch from local variables to args.var
+  local on = self.on and (args.on == nil and true or args.on)
   
-  scale = args.scale == nil and self.scale or args.scale
-  transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
-  degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
-  octave = self.octave + (args.octave == nil and 0 or args.octave)
-  synth = args.synth == nil and self.synth or args.synth
-  wrap = args.wrap == nil and self.wrap or args.wrap
-  mask = args.mask == nil and self.mask or args.mask
-  negharm = args.negharm == nil and self.negharm or args.negharm
+  local scale = args.scale == nil and self.scale or args.scale
+  local transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
+  local degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
+  local octave = self.octave + (args.octave == nil and 0 or args.octave)
+  local synth = args.synth == nil and self.synth or args.synth
+  local wrap = args.wrap == nil and self.wrap or args.wrap
+  local mask = args.mask == nil and self.mask or args.mask
+  local negharm = args.negharm == nil and self.negharm or args.negharm
   
-  -- TODO make these val1, val2, val3 etc. for custom functionality
-  level = self.level * (args.level == nil and 1 or args.level)
-  length = self.length * (args.length == nil and 1 or args.length)
-  channel = args.channel == nil and self.channel or args.channel
+  local level = self.level * (args.level == nil and 1 or args.level)
+  local length = self.length * (args.length == nil and 1 or args.length)
+  local channel = args.channel == nil and self.channel or args.channel
+  local user = self.user == nil and self.user or args.user
 
   octave = wrap and octave or octave + math.floor(degree / #scale)
-  ix = mask and self.apply_mask(degree, scale, mask) % #scale + 1 or degree % #scale + 1
-  -- ix = degree % #scale + 1
-  val = negharm and (7 - scale[ix]) % 12 or scale[ix]
-  note = val + transpose + (octave * 12)
+  local ix = mask and self.apply_mask(degree, scale, mask) % #scale + 1 or degree % #scale + 1
   -- TODO apply musicutil snap to note here
+  -- ix = degree % #scale + 1
+  local val = negharm and (7 - scale[ix]) % 12 or scale[ix]
+  local note = val + transpose + (octave * 12)
 
-  return on and synth(note, level, length, channel)
+  return on and synth(note, level, length, channel, user)
 end
 
 -- TODO, function that creates sequins
