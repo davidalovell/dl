@@ -21,10 +21,9 @@ function Vox:new(args)
   o.channel = args.channel == nil and 1 or args.channel
 
   -- other
-  o.division = args.division == nil and 1/16 or args.division -- store division setting -- NO LONGER NEEDED
-  o.seq = args.seq == nil and {} or args.seq -- container for seq
   o.s = args.s == nil and {} or args.s -- contaner for sequins
   o.l = args.l == nil and {} or args.l -- container for lattice
+  o.seq = args.seq == nil and {} or args.seq -- container for seq
 
   return o
 end
@@ -61,6 +60,7 @@ function Vox:play(args)
   mask = args.mask == nil and self.mask or args.mask
   negharm = args.negharm == nil and self.negharm or args.negharm
   
+  -- TODO make these val1, val2, val3 etc. for custom functionality
   level = self.level * (args.level == nil and 1 or args.level)
   length = self.length * (args.length == nil and 1 or args.length)
   channel = args.channel == nil and self.channel or args.channel
@@ -70,9 +70,13 @@ function Vox:play(args)
   -- ix = degree % #scale + 1
   val = negharm and (7 - scale[ix]) % 12 or scale[ix]
   note = val + transpose + (octave * 12)
+  -- TODO apply musicutil snap to note here
 
   return on and synth(note, level, length, channel)
 end
+
+-- TODO, function that creates sequins
+-- TODO, function that creates seq
 
 function Vox:reset()
   for k, v in pairs(self.s) do
