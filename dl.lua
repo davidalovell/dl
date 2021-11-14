@@ -14,13 +14,6 @@ function sync(sync, fn)
   return clock.run(function() clock.sync(sync); fn() end)
 end
 
--- TODO incorporate this into vox
-function midi_notes_off(device)
-  for i = 0, 127 do
-    device:note_off(i)
-  end
-end
-
 
 
 
@@ -45,7 +38,6 @@ function clock.transport.stop()
   l:stop()
   l:reset() -- ?put this inside vox
   vox.call(voices, 'reset')
-  midi_notes_off(m)
 end
 
 
@@ -57,10 +49,11 @@ end
 
 -- typical contstruct
 bass = vox:new{
-  on = true,
+  device = midi.connect(1),
   channel = 1,
-  scale = vox.apply_scale('lydian'),
+  on = true,
   octave = 4,
+  scale = vox.apply_scale('lydian'),
   length = 1/4
 }
 

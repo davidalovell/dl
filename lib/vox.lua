@@ -85,6 +85,11 @@ function Vox:reset()
   end
 
   self.seq:reset() -- reset seq
+
+  -- midi notes off
+  for i = 0, 127 do
+    self.device:note_off(i)
+  end
 end
 
 function Vox.apply_scale(scale)
