@@ -2,6 +2,22 @@
 -- nestable tables with sequencing behaviours & control flow
 -- TODO i think ASL can be defined in terms of a sequins...
 
+-- @davidlovell
+-- this is a hacked version of sequins
+-- you can use the 'nested' methods in an 'unnested' way
+-- :every(n, mod, hold)
+-- -- mod
+-- -- will return value every n
+-- -- defaults to 0
+-- -- 1 will return value the first time sequins is called, 2 will return value the second time etc.
+-- -- hold
+-- -- changes what is returned when every does not return the next value
+-- -- defaults to nil - this returns nil rather than an empty table
+-- -- 0 returns 0 (useful if you want to perform arithmetic on the result of a sequins, but returns nil)
+-- -- 1 returns the
+-- :skip(n, mod, hold)
+-- -- like every, but advances to the next element in the background without returning it
+
 -- S={}
 local S = {}
 function S.new(t)

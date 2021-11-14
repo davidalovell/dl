@@ -1,8 +1,7 @@
 -- seq is a wrapper for sequins
--- allows division, skip, beat (i.e. which 'beat' division or skip occurs), hold (allows for ratcheting), probability that a note will return (sequins will advance)
 
 local Seq = {}
-local sequins = include('lib/sequins_h'); s = sequins
+local sequins = include('lib/sequins_dl'); s = sequins
 
 function Seq:new(args)
   local o = setmetatable( {}, {__index = Seq} )
@@ -23,6 +22,7 @@ function Seq:new(args)
   o.count = - o.offset
   o.val = 0
   o.last = o.val
+  o.held = false
 
   return o
 end
@@ -33,7 +33,11 @@ function Seq:play(args)
 
 	for k, v in pairs(args) do
 	  if sequins.is_sequins(v) or type(v) == 'function' then
-	    updated_args[k] = v()
+      if self.held == false then
+	      updated_args[k] = v()
+      else
+        updated_args[k] = v[v.ix]
+      end
 	  else
 	    updated_args[k] = v
 	  end
@@ -45,15 +49,13 @@ function Seq:play(args)
 
 	args = updated_args
 
-  local seq = args.seq == nil and self.seq or args.seq; self.s:settable(seq)
-  local step = args.step == nil and self.step or args.step; self.s:step(step)
-
-  local div = self.div * (args.div == nil and 1 or args.div)
-  local skip = args.skip == nil and self.skip or args.skip
-  local beat = args.beat == nil and self.beat or args.beat
-  local prob = args.prob == nil and self.prob or args.prob
-  local hold = args.hold == nil and self.hold or args.hold
-  local held
+  args.seq = args.seq == nil and self.seq or args.seq; self.s:settable(args.seq)
+  args.step = args.step == nil and self.step or args.step; self.s:step(args.step)
+  args.div = self.div * (args.div == nil and 1 or args.div)
+  args.skip = args.skip == nil and self.skip or args.skip
+  args.beat = args.beat == nil and self.beat or args.beat
+  args.prob = args.prob == nil and self.prob or args.prob
+  args.hold = args.hold == nil and self.hold or args.hold
 
   self.count = self.count + 1
 
@@ -61,22 +63,22 @@ function Seq:play(args)
     return
   end
 
-  if self.count % div == beat % div then
-    held = false
+  if self.count % args.div == args.beat % args.div then
+    self.held = false
     self.val = self.s()
   else
-    held = true
+    self.held = true
     self.val = self.s[self.s.ix]
   end
-  if self.count % (skip * div) == beat % (skip * div) and prob >= math.random() then
-    held = false
+  if self.count % (args.skip * args.div) == args.beat % (args.skip * args.div) and args.prob >= math.random() then
+    self.held = false
     self.last = self.val
   else
-    held = true
+    self.held = true
     self.val = self.last
   end
 
-  if not hold and held then
+  if not args.hold and self.held then
     return
   end
   

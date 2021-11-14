@@ -6,6 +6,7 @@
 -- https://github.com/monome/crow/blob/34ce1e455f01fdef65a0d37aa97163b4cd14a115/lua/sequins.lua
 --
 -- @davidlovell
+-- sequins_dl.lua
 -- this version has been hacked so the every method for nested sequins now takes two arguments
 -- :every(n, beat)
 -- n is the number of times sequins has to be called before a result is returned

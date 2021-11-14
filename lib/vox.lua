@@ -1,5 +1,5 @@
 local Vox = {}
-local sequins = include('lib/sequins_h'); s = sequins
+local sequins = include('lib/sequins_dl'); s = sequins
 local musicutil = require('musicutil')
 
 function Vox:new(args)
@@ -7,12 +7,27 @@ function Vox:new(args)
   local args = args == nil and {} or args
 
   o.on = args.on == nil and true or args.on
-  o.scale = args.scale == nil and {0,2,4,6,7,9,11} or args.scale -- lydian
-  -- TODO either table or string
+  o.scale = args.scale == nil and {0,2,4,6,7,9,11} or args.scale
   o.transpose = args.transpose == nil and 0 or args.transpose
   o.degree = args.degree == nil and 1 or args.degree
   o.octave = args.octave == nil and 5 or args.octave -- C5
-  o.synth = args.synth == nil and function(self, args) return args.note end or args.synth
+
+  o.synth = args.synth == nil
+    and -- function(self, args) return args.note end or args.synth
+      function(self, args)
+        self.action(self, args)
+        clock.run(
+          function()
+            args.device:note_on(args.note, args.level, args.channel)
+            clock.sync(args.length)
+            args.device:note_off(args.note, args.level, args.channel)
+          end
+        )
+        return args.note
+      end
+    or args.synth
+  o.action = args.action == nil and function(self, args) return end or args.action
+
   o.wrap = args.wrap ~= nil and args.wrap or false
   o.mask = args.mask -- could use MusicUtil instead
   o.negharm = args.negharm ~= nil and args.negharm or false
@@ -55,6 +70,7 @@ function Vox:play(args)
   args.degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
   args.octave = self.octave + (args.octave == nil and 0 or args.octave)
   args.synth = args.synth == nil and self.synth or args.synth
+  args.action = args.action == nil and self.action or args.action
   args.wrap = args.wrap == nil and self.wrap or args.wrap
   args.mask = args.mask == nil and self.mask or args.mask
   args.negharm = args.negharm == nil and self.negharm or args.negharm
@@ -66,6 +82,7 @@ function Vox:play(args)
   args.user = self.user == nil and self.user or args.user
 
   -- TODO make this into some if statements for ease of reading
+  args.scale = type(args.scale) == 'string' and musicutil.generate_scale_of_length(0, args.scale, 7) or args.scale
   args.octave = args.wrap and args.octave or args.octave + math.floor(args.degree / #args.scale)
   args.ix = args.mask and self.apply_mask(args.degree, args.scale, args.mask) % #args.scale + 1 or args.degree % #args.scale + 1
   -- TODO apply musicutil snap to note here
@@ -80,20 +97,15 @@ end
 
 function Vox:reset()
   -- TODO some error handling
+  -- reset sequins
   for k, v in pairs(self.s) do
-    self.s[k]:reset() -- reset sequins
+    self.s[k]:reset()
   end
-
   self.seq:reset() -- reset seq
-
-  -- midi notes off
+   -- midi notes off
   for i = 0, 127 do
     self.device:note_off(i)
   end
-end
-
-function Vox.apply_scale(scale)
-  return musicutil.generate_scale_of_length(0, scale, 7)
 end
 
 function Vox.apply_mask(degree, scale, mask)
