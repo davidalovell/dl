@@ -6,11 +6,11 @@
 -- https://github.com/monome/crow/blob/34ce1e455f01fdef65a0d37aa97163b4cd14a115/lua/sequins.lua
 --
 -- @davidlovell
--- this version has been hacked so :every() now takes two arguments
+-- this version has been hacked so the every method for nested sequins now takes two arguments
 -- :every(n, beat)
--- n has usual functionality
--- beat, defaults to 0. this meants that the nested sequins will return a value the nth time it is called
--- if beat is 1 then sequins will return a value the 1st time it is called, and reset every n
+-- n is the number of times sequins has to be called before a result is returned
+-- beat is the 'beat' on which a result is returned, defaults to 0
+-- e.g. if beat is 1 then sequins will return a value the 1st time it is called, and reset every n times
 -- beat wraps to n
 
 local S = {}
