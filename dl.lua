@@ -45,15 +45,6 @@ bass = vox:new{
   length = 1/4
 }
 
-bass.device.event = function(data)
-  local msg = midi.to_msg(data)
-  if msg.type == 'cc' then
-    -- if msg.cc == 70 then
-    --   bass.seq.skip = math.floor(msg.val) + 1
-    -- end
-  end
-end
-
 bass.user = {
   cutoff = 0.5
 }
@@ -64,7 +55,7 @@ bass.action = function(self, args)
 end
 
 bass.s = {
-  div = s{2,4,3,3,16},
+  div = s{2,4,3,3,1,16},
   cutoff = s{0.5,0.7,0.5,0.7,0.6}
 }
 
@@ -76,12 +67,21 @@ bass.l = l:new_pattern{
 }
 
 bass.seq = seq:new{
-  div = 1,
+  div = 2,
   seq = {1,4,5,s{7,9,6,11}},
   action = function(val)
     bass:play{degree = val, user = {cutoff = bass.s.cutoff}}
   end
 }
+
+bass.device.event = function(data)
+  local msg = midi.to_msg(data)
+  if msg.type == 'cc' then
+    -- if msg.cc == 70 then
+    --   bass.seq.skip = math.floor(msg.val) + 1
+    -- end
+  end
+end
 
 
 
