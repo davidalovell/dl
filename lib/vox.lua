@@ -1,5 +1,5 @@
 local Vox = {}
-local sequins = require('sequins'); s = sequins
+local sequins = include('lib/sequins_h'); s = sequins
 local musicutil = require('musicutil')
 
 function Vox:new(args)

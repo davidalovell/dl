@@ -4,7 +4,7 @@ end
 
 function r() norns.script.load(norns.script.state) end
 
-sequins = require('sequins'); s = sequins
+sequins = include('lib/sequins_h'); s = sequins
 lattice = include('lib/lattice_1.2'); l = lattice:new()
 vox = include('lib/vox')
 seq = include('lib/seq')
@@ -14,6 +14,7 @@ function sync(sync, fn)
   return clock.run(function() clock.sync(sync); fn() end)
 end
 
+-- TODO incorporate this into vox
 function midi_notes_off(device)
   for i = 0, 127 do
     device:note_off(i)

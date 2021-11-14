@@ -2,7 +2,7 @@
 -- allows division, skip, beat (i.e. which 'beat' division or skip occurs), hold (allows for ratcheting), probability that a note will return (sequins will advance)
 
 local Seq = {}
-local sequins = require('sequins'); s = sequins
+local sequins = include('lib/sequins_h'); s = sequins
 
 function Seq:new(args)
   local o = setmetatable( {}, {__index = Seq} )
