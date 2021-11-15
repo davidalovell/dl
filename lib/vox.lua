@@ -11,6 +11,9 @@ function Vox:new(args)
   o.transpose = args.transpose == nil and 0 or args.transpose
   o.degree = args.degree == nil and 1 or args.degree
   o.octave = args.octave == nil and 5 or args.octave -- C5
+  o.wrap = args.wrap ~= nil and args.wrap or false
+  o.mask = args.mask -- could use MusicUtil instead
+  o.negharm = args.negharm ~= nil and args.negharm or false
 
   o.synth = args.synth == nil
     and -- function(self, args) return args.note end or args.synth
@@ -18,8 +21,9 @@ function Vox:new(args)
         self.action(self, args)
         clock.run(
           function()
+            -- clock.sleep(clock.get_beat_sec() * args.division)
             args.device:note_on(args.note, args.level, args.channel)
-            clock.sync(args.length)
+            clock.sleep(clock.get_beat_sec() * args.length)
             args.device:note_off(args.note, args.level, args.channel)
           end
         )
@@ -27,16 +31,14 @@ function Vox:new(args)
       end
     or args.synth
   o.action = args.action == nil and function(self, args) return end or args.action
+  o.division = args.division == nil and 1 or args.division
 
-  o.wrap = args.wrap ~= nil and args.wrap or false
-  o.mask = args.mask -- could use MusicUtil instead
-  o.negharm = args.negharm ~= nil and args.negharm or false
-  
   o.level = args.level == nil and 1 or args.level
   o.length = args.length == nil and 1 or args.length
   o.channel = args.channel == nil and 1 or args.channel
   o.device = args.device == nil and midi.connect(1) or args.device
   o.user = args.user == nil and {} or args.user
+
 
   o.s = args.s == nil and {} or args.s -- contaner for sequins
   o.l = args.l == nil and {} or args.l -- container for lattice
@@ -69,11 +71,13 @@ function Vox:play(args)
   args.transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
   args.degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
   args.octave = self.octave + (args.octave == nil and 0 or args.octave)
-  args.synth = args.synth == nil and self.synth or args.synth
-  args.action = args.action == nil and self.action or args.action
   args.wrap = args.wrap == nil and self.wrap or args.wrap
   args.mask = args.mask == nil and self.mask or args.mask
   args.negharm = args.negharm == nil and self.negharm or args.negharm
+
+  args.synth = args.synth == nil and self.synth or args.synth
+  args.action = args.action == nil and self.action or args.action
+  args.division = args.division == nil and self.division or args.division
   
   args.level = math.ceil(self.level * (args.level == nil and 1 or args.level) * 127)
   args.length = self.length * (args.length == nil and 1 or args.length)
