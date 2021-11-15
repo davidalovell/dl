@@ -67,7 +67,7 @@ bass.l = l:new_pattern{
 }
 
 bass.seq = seq:new{
-  div = 2,
+  div = 1,
   seq = {1,4,5,s{7,9,6,11}},
   action = function(val)
     bass:play{degree = val, user = {cutoff = bass.s.cutoff}}
@@ -83,8 +83,38 @@ bass.device.event = function(data)
   end
 end
 
+a4 = vox:new{
+  device = midi.connect(2),
+  channel = 1,
+  on = true,
+  scale = 'lydian',
+  length = 1/4
+}
+
+a4.s = {
+  div = s{32,3,5,1,5}
+  -- on = s{true,false} -- i don't think this works in an expected way
+}
+
+a4.l = l:new_pattern{
+  division = 1/16,
+  action = function()
+    a4.seq:play{div = a4.s.div}
+  end
+}
+
+a4.seq = seq:new{
+  div = 1,
+  seq = {1,10,9,7,s{6,4}},
+  action = function(val)
+    a4:play{degree = val}--, on = a4.s.on}
+  end
+}
+
+
+-- idea, vox takes sync, sleep and passes to sleep
 
 
 
 
-voices = {bass}
+voices = {bass, a4}
