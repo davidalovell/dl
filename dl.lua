@@ -14,7 +14,9 @@ function sync(sync, fn)
 end
 
 
-
+clock.wait = function(div)
+  clock.sleep(clock.get_beat_sec() * div)
+end
 
 
 
