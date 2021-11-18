@@ -1,3 +1,5 @@
+-- dl
+
 function reload()
   norns.script.load('code/dl/dl.lua')
 end
@@ -11,6 +13,20 @@ seq = include('lib/seq')
 
 function sync(sync, fn)
   return clock.run(function() clock.sync(sync); fn() end)
+end
+
+
+
+
+midisynth = function(args)
+  clock.run(
+    function()
+      -- clock.sleep(clock.get_beat_sec() * args.division)
+      args.device:note_on(args.note, args.level, args.channel)
+      clock.sleep(clock.get_beat_sec() * args.length)
+      args.device:note_off(args.note, args.level, args.channel)
+    end
+  )
 end
 
 
@@ -33,9 +49,9 @@ end
 
 
 
-
 -- typical contstruct
 bass = vox:new{
+  synth = midisynth,
   device = midi.connect(1),
   channel = 1,
   on = true,
@@ -83,6 +99,7 @@ bass.device.event = function(data)
 end
 
 a4 = vox:new{
+  synth = midisynth,
   device = midi.connect(2),
   channel = 1,
   on = true,

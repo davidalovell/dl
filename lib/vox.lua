@@ -15,22 +15,8 @@ function Vox:new(args)
   o.mask = args.mask -- could use MusicUtil instead
   o.negharm = args.negharm ~= nil and args.negharm or false
 
-  o.synth = args.synth == nil
-    and -- function(self, args) return args.note end or args.synth
-      function(self, args)
-        self.action(self, args)
-        clock.run(
-          function()
-            -- clock.sleep(clock.get_beat_sec() * args.division)
-            args.device:note_on(args.note, args.level, args.channel)
-            clock.sleep(clock.get_beat_sec() * args.length)
-            args.device:note_off(args.note, args.level, args.channel)
-          end
-        )
-        return args.note
-      end
-    or args.synth
   o.action = args.action == nil and function(self, args) return end or args.action
+  o.synth = args.synth == nil and function(self, args) return args.note end or args.synth
   o.division = args.division == nil and 1 or args.division
 
   o.level = args.level == nil and 1 or args.level
@@ -38,7 +24,6 @@ function Vox:new(args)
   o.channel = args.channel == nil and 1 or args.channel
   o.device = args.device == nil and midi.connect(1) or args.device
   o.user = args.user == nil and {} or args.user
-
 
   o.s = args.s == nil and {} or args.s -- contaner for sequins
   o.l = args.l == nil and {} or args.l -- container for lattice
@@ -75,8 +60,8 @@ function Vox:play(args)
   args.mask = args.mask == nil and self.mask or args.mask
   args.negharm = args.negharm == nil and self.negharm or args.negharm
 
-  args.synth = args.synth == nil and self.synth or args.synth
   args.action = args.action == nil and self.action or args.action
+  args.synth = args.synth == nil and self.synth or args.synth
   args.division = args.division == nil and self.division or args.division
   
   args.level = math.ceil(self.level * (args.level == nil and 1 or args.level) * 127)
@@ -93,7 +78,11 @@ function Vox:play(args)
   args.val = args.negharm and (7 - args.scale[args.ix]) % 12 or args.scale[args.ix]
   args.note = args.val + args.transpose + (args.octave * 12)
 
-  return args.on and args.synth(self, args)
+  if args.on then
+    args.action(self, args)
+    args.synth(args)
+    return args.note
+  end
 end
 
 -- TODO, function that creates sequins
