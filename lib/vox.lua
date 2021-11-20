@@ -12,11 +12,11 @@ function Vox:new(args)
   o.degree = args.degree == nil and 1 or args.degree
   o.octave = args.octave == nil and 5 or args.octave -- C5
   o.wrap = args.wrap ~= nil and args.wrap or false
-  o.mask = args.mask -- could use MusicUtil instead
+  o.mask = args.mask
   o.negharm = args.negharm ~= nil and args.negharm or false
 
   o.action = args.action == nil and function(self, args) return end or args.action
-  o.synth = args.synth == nil and function(self, args) return args.note end or args.synth
+  o.synth = args.synth == nil and function(self, args) return end or args.synth
 
   o.level = args.level == nil and 1 or args.level
   o.length = args.length == nil and 1 or args.length
@@ -33,25 +33,24 @@ end
 
 function Vox:play(args)
   local args = args == nil and {} or args
-  
+
   local updated_args = {}
 
   for k, v in pairs(args) do
-	if sequins.is_sequins(v) or type(v) == 'function' then
-	  updated_args[k] = v()
-	else
-	  updated_args[k] = v
-	end
+    if sequins.is_sequins(v) or type(v) == 'function' then
+      updated_args[k] = v()
+    else
+      updated_args[k] = v
+    end
 
     if updated_args[k] == nil then
-	  return
-	end
+      return
+    end
   end
 
   args = updated_args
 
   args.on = self.on and (args.on == nil and true or args.on)
-  
   args.scale = args.scale == nil and self.scale or args.scale
   args.transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
   args.degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
@@ -69,11 +68,10 @@ function Vox:play(args)
   args.device = args.device == nil and self.device or args.device
   args.user = self.user == nil and self.user or args.user
 
-  -- TODO make this into some if statements for ease of reading
   args.scale = type(args.scale) == 'string' and musicutil.generate_scale_of_length(0, args.scale, 7) or args.scale
   args.octave = args.wrap and args.octave or args.octave + math.floor(args.degree / #args.scale)
   args.ix = args.mask and self.apply_mask(args.degree, args.scale, args.mask) % #args.scale + 1 or args.degree % #args.scale + 1
-  -- TODO apply musicutil snap to note here
+  -- args.ix = args.mask and musicutil.snap_note_to_array(args.ix, args.mask) % #args.scale + 1 or args.degree % #args.scale + 1
   args.val = args.negharm and (7 - args.scale[args.ix]) % 12 or args.scale[args.ix]
   args.note = args.val + args.transpose + (args.octave * 12)
 
@@ -84,17 +82,17 @@ function Vox:play(args)
   end
 end
 
--- TODO, function that creates sequins
--- TODO, function that creates seq
+-- TODO function that creates sequins
+-- TODO function that creates seq
 
 function Vox:reset()
-  -- TODO some error handling
-  -- reset sequins
+  -- TODO error handling if no sequins, seq or midi
+  self.seq:reset()
+
   for k, v in pairs(self.s) do
     self.s[k]:reset()
   end
-  self.seq:reset() -- reset seq
-   -- midi notes off
+
   for i = 0, 127 do
     self.device:note_off(i)
   end

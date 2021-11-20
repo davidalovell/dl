@@ -36,21 +36,21 @@ function Seq:play(args)
   local updated_args = {}
 
   for k, v in pairs(args) do
-	if sequins.is_sequins(v) or type(v) == 'function' then
+    if sequins.is_sequins(v) or type(v) == 'function' then
       if self.held == false then
-	    updated_args[k] = v()
+        updated_args[k] = v()
       else
         updated_args[k] = v[v.ix]
       end
-	else
-	  updated_args[k] = v
-	end
+    else
+      updated_args[k] = v
+    end
 
     if updated_args[k] == nil then
-	  return
-	end
+      return
+    end
   end
-
+  
   args = updated_args
 
   args.seq = args.seq == nil and self.seq or args.seq; self.s:settable(args.seq)
