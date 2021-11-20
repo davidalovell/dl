@@ -33,21 +33,22 @@ end
 
 function Vox:play(args)
   local args = args == nil and {} or args
-	local updated_args = {}
+  
+  local updated_args = {}
 
-	for k, v in pairs(args) do
-	  if sequins.is_sequins(v) or type(v) == 'function' then
-	    updated_args[k] = v()
-	  else
-	    updated_args[k] = v
-	  end
-
-		if updated_args[k] == nil then
-		  return
-		end
+  for k, v in pairs(args) do
+	if sequins.is_sequins(v) or type(v) == 'function' then
+	  updated_args[k] = v()
+	else
+	  updated_args[k] = v
 	end
 
-	args = updated_args
+    if updated_args[k] == nil then
+	  return
+	end
+  end
+
+  args = updated_args
 
   args.on = self.on and (args.on == nil and true or args.on)
   

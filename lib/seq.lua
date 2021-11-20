@@ -82,29 +82,22 @@ function Seq:play(args)
     skip_cond = self.skip_count == args.beat 
   end
   
-  -- local held
-
   if div_cond then
-    -- held = false
     self.held = false
     self.val = self.s()
   else
-    -- held = true
     self.held = true
     self.val = self.s[self.s.ix]
   end
 
   if skip_cond and args.prob >= math.random() then
-    -- held = false
     self.held = false
     self.last = self.val
   else
-    -- held = true
     self.held = true
     self.val = self.last
   end
 
-  -- if not args.hold and held then
   if not args.hold and self.held then
     return
   end
