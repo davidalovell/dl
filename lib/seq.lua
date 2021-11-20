@@ -57,7 +57,6 @@ function Seq:play(args)
   args.step = args.step == nil and self.step or args.step; self.s:step(args.step)
   args.div = self.div * (args.div == nil and 1 or args.div)
   args.skip = args.skip == nil and self.skip or args.skip
-  args.wait = args.wait == nil and self.wait or args.wait
   args.beat = args.beat == nil and self.beat or args.beat
   args.prob = args.prob == nil and self.prob or args.prob
   args.hold = args.hold == nil and self.hold or args.hold
