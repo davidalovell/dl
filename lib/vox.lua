@@ -17,7 +17,6 @@ function Vox:new(args)
 
   o.action = args.action == nil and function(self, args) return end or args.action
   o.synth = args.synth == nil and function(self, args) return args.note end or args.synth
-  o.division = args.division == nil and 1 or args.division
 
   o.level = args.level == nil and 1 or args.level
   o.length = args.length == nil and 1 or args.length
@@ -62,7 +61,6 @@ function Vox:play(args)
 
   args.action = args.action == nil and self.action or args.action
   args.synth = args.synth == nil and self.synth or args.synth
-  args.division = args.division == nil and self.division or args.division
   
   args.level = math.ceil(self.level * (args.level == nil and 1 or args.level) * 127)
   args.length = self.length * (args.length == nil and 1 or args.length)

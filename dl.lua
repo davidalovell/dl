@@ -21,7 +21,6 @@ end
 midisynth = function(args)
   clock.run(
     function()
-      -- clock.sleep(clock.get_beat_sec() * args.division)
       args.device:note_on(args.note, args.level, args.channel)
       clock.sleep(clock.get_beat_sec() * args.length)
       args.device:note_off(args.note, args.level, args.channel)
@@ -121,7 +120,7 @@ a4.l = l:new_pattern{
 
 a4.seq = seq:new{
   div = 1,
-  seq = {1,10,9,7,s{6,4}},
+  seq = {11,10,9,7,s{6,4,3}},
   action = function(val)
     a4:play{degree = val}--, on = a4.s.on}
   end

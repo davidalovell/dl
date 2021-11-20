@@ -15,11 +15,14 @@ function Seq:new(args)
   o.beat = args.beat == nil and 1 or args.beat
   o.prob = args.prob == nil and 1 or args.prob
   o.hold = args.hold == nil and false or args.hold
+  o.abs = args.abs == nil and false or args.abs -- absolute division, default is relative division
 
   o.offset = args.offset == nil and 0 or args.offset
   o.action = args.action
 
   o.count = - o.offset
+  o.div_count = - o.offset
+  o.skip_count = - o.offset
   o.val = 0
   o.last = o.val
   o.held = false
@@ -53,24 +56,41 @@ function Seq:play(args)
   args.step = args.step == nil and self.step or args.step; self.s:step(args.step)
   args.div = self.div * (args.div == nil and 1 or args.div)
   args.skip = args.skip == nil and self.skip or args.skip
+  args.wait = args.wait == nil and self.wait or args.wait
   args.beat = args.beat == nil and self.beat or args.beat
   args.prob = args.prob == nil and self.prob or args.prob
   args.hold = args.hold == nil and self.hold or args.hold
+  args.abs = args.abs == nil and self.abs or args.abs
 
   self.count = self.count + 1
 
   if self.count < 1 then
     return
   end
+  
+  self.div_count = self.div_count % args.div + 1
+  self.skip_count = self.skip_count % (args.skip * args.div) + 1
 
-  if self.count % args.div == args.beat % args.div then
+  local div_cond
+  local skip_cond 
+
+  if args.abs then
+    div_cond = self.count % args.div == args.beat % args.div
+    skip_cond = self.count % (args.skip * args.div) == args.beat % (args.skip * args.div)
+  else
+    div_cond = self.div_count == args.beat
+    skip_cond = self.skip_count == args.beat 
+  end
+
+  if div_cond then
     self.held = false
     self.val = self.s()
   else
     self.held = true
     self.val = self.s[self.s.ix]
   end
-  if self.count % (args.skip * args.div) == args.beat % (args.skip * args.div) and args.prob >= math.random() then
+
+  if skip_cond and args.prob >= math.random() then
     self.held = false
     self.last = self.val
   else
@@ -91,6 +111,8 @@ end
 
 function Seq:reset()
   self.count = - self.offset
+  self.div_count = - self.offset
+  self.skip_count = - self.offset
   self.val = 0
   self.last = self.val
   self.s:reset()
