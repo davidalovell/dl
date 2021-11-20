@@ -6,26 +6,17 @@ end
 
 function r() norns.script.load(norns.script.state) end
 
-sequins = include('lib/sequins_dl'); s = sequins
+sequins = include('lib/sequins_unnested'); s = sequins
 lattice = include('lib/lattice_1.2'); l = lattice:new()
 vox = include('lib/vox')
 seq = include('lib/seq')
+musicutil = require('musicutil')
+
+
+
 
 function sync(sync, fn)
   return clock.run(function() clock.sync(sync); fn() end)
-end
-
-
-
-
-midisynth = function(args)
-  clock.run(
-    function()
-      args.device:note_on(args.note, args.level, args.channel)
-      clock.sleep(clock.get_beat_sec() * args.length)
-      args.device:note_off(args.note, args.level, args.channel)
-    end
-  )
 end
 
 
@@ -46,11 +37,9 @@ end
 
 
 
-
-
 -- typical contstruct
 bass = vox:new{
-  synth = midisynth,
+  synth = vox.midisynth,
   device = midi.connect(1),
   channel = 1,
   on = true,
@@ -81,7 +70,7 @@ bass.l = l:new_pattern{
 }
 
 bass.seq = seq:new{
-  div = 1,
+  div = 2,
   seq = {1,4,5,s{7,9,6,11}},
   action = function(val)
     bass:play{degree = val, user = {cutoff = bass.s.cutoff}}
@@ -97,8 +86,12 @@ bass.device.event = function(data)
   end
 end
 
+
+
+
+
 a4 = vox:new{
-  synth = midisynth,
+  synth = vox.midisynth,
   device = midi.connect(2),
   channel = 1,
   on = true,
@@ -119,15 +112,12 @@ a4.l = l:new_pattern{
 }
 
 a4.seq = seq:new{
-  div = 1,
-  seq = {11,10,9,7,s{6,4,3}},
+  div = 3,
+  seq = {s{11,5,13},10,9,7,s{6,4,3}},
   action = function(val)
     a4:play{degree = val}--, on = a4.s.on}
   end
 }
-
-
--- idea, vox takes sync, sleep and passes to sleep
 
 
 

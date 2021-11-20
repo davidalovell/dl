@@ -70,10 +70,11 @@ function Vox:play(args)
 
   args.scale = type(args.scale) == 'string' and musicutil.generate_scale_of_length(0, args.scale, 7) or args.scale
   args.octave = args.wrap and args.octave or args.octave + math.floor(args.degree / #args.scale)
-  args.ix = args.mask and self.apply_mask(args.degree, args.scale, args.mask) % #args.scale + 1 or args.degree % #args.scale + 1
-  -- args.ix = args.mask and musicutil.snap_note_to_array(args.ix, args.mask) % #args.scale + 1 or args.degree % #args.scale + 1
-  args.val = args.negharm and (7 - args.scale[args.ix]) % 12 or args.scale[args.ix]
-  args.note = args.val + args.transpose + (args.octave * 12)
+
+  args.ix = args.degree % #args.scale + 1
+  args.ix = args.mask and musicutil.snap_note_to_array(args.ix, args.mask) or args.ix
+  args.note = args.negharm and (7 - args.scale[args.ix]) % 12 or args.scale[args.ix]
+  args.note = args.note + args.transpose + (args.octave * 12)
 
   if args.on then
     args.action(self, args)
@@ -98,15 +99,25 @@ function Vox:reset()
   end
 end
 
-function Vox.apply_mask(degree, scale, mask)
-  local ix, closest_val = degree % #scale + 1, mask[1]
-  for _, val in ipairs(mask) do
-    val = (val - 1) % #scale + 1
-    closest_val = math.abs(val - ix) < math.abs(closest_val - ix) and val or closest_val
-  end
-  local degree = closest_val - 1
-  return degree
+function Vox.midisynth(args)
+  clock.run(
+    function()
+      args.device:note_on(args.note, args.level, args.channel)
+      clock.sleep(clock.get_beat_sec() * args.length)
+      args.device:note_off(args.note, args.level, args.channel)
+    end
+  )
 end
+
+-- function Vox.apply_mask(degree, scale, mask)
+--   local ix, closest_val = degree % #scale + 1, mask[1]
+--   for _, val in ipairs(mask) do
+--     val = (val - 1) % #scale + 1
+--     closest_val = math.abs(val - ix) < math.abs(closest_val - ix) and val or closest_val
+--   end
+--   local degree = closest_val - 1
+--   return degree
+-- end
 
 function Vox.set(objects, property, val)
   for k, v in pairs(objects) do
