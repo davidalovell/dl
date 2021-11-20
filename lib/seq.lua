@@ -32,25 +32,26 @@ end
 
 function Seq:play(args)
   local args = args == nil and {} or args
-	local updated_args = {}
+  
+  local updated_args = {}
 
-	for k, v in pairs(args) do
-	  if sequins.is_sequins(v) or type(v) == 'function' then
+  for k, v in pairs(args) do
+	if sequins.is_sequins(v) or type(v) == 'function' then
       if self.held == false then
-	      updated_args[k] = v()
+	    updated_args[k] = v()
       else
         updated_args[k] = v[v.ix]
       end
-	  else
-	    updated_args[k] = v
-	  end
-
-    if updated_args[k] == nil then
-		  return
-		end
+	else
+	  updated_args[k] = v
 	end
 
-	args = updated_args
+    if updated_args[k] == nil then
+	  return
+	end
+  end
+
+  args = updated_args
 
   args.seq = args.seq == nil and self.seq or args.seq; self.s:settable(args.seq)
   args.step = args.step == nil and self.step or args.step; self.s:step(args.step)
@@ -81,23 +82,30 @@ function Seq:play(args)
     div_cond = self.div_count == args.beat
     skip_cond = self.skip_count == args.beat 
   end
+  
+  -- local held
 
   if div_cond then
+    -- held = false
     self.held = false
     self.val = self.s()
   else
+    -- held = true
     self.held = true
     self.val = self.s[self.s.ix]
   end
 
   if skip_cond and args.prob >= math.random() then
+    -- held = false
     self.held = false
     self.last = self.val
   else
+    -- held = true
     self.held = true
     self.val = self.last
   end
 
+  -- if not args.hold and held then
   if not args.hold and self.held then
     return
   end
