@@ -37,7 +37,7 @@ function Vox:play(args)
   local updated_args = {}
 
   for k, v in pairs(args) do
-    if sequins.is_sequins(v) or type(v) == 'function' then
+    if s.is_sequins(v) or type(v) == 'function' then
       updated_args[k] = v()
     else
       updated_args[k] = v

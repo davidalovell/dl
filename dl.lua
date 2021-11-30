@@ -6,6 +6,13 @@ end
 
 function r() norns.script.load(norns.script.state) end
 
+function key(n,z)
+  -- key actions: n = number, z = state
+  if n == 3 and z == 1 then
+    r()
+  end
+end
+
 sequins = include('lib/sequins_unnested'); s = sequins
 lattice = include('lib/lattice_1.2'); l = lattice:new()
 vox = include('lib/vox')
@@ -89,6 +96,42 @@ end
 
 
 
+chord = vox:new{
+  synth = vox.midisynth,
+  device = midi.connect(1),
+  channel = 2,
+  on = true,
+  octave = 4,
+  scale = 'lydian',
+  length = 4
+}
+
+chord.s = {
+  degree1 = s{1,  2},
+  degree2 = s{5,  6},
+  degree3 = s{10, 10, 10, 10, 10, 10, 12, 11}
+}
+
+chord.l = l:new_pattern{
+  division = 1/16,
+  seq = {1},
+  action = function()
+    chord.seq:play()
+  end
+}
+
+chord.seq = seq:new{
+  div = 64,
+  action = function(val)
+    chord:play{degree = chord.s.degree1}
+    chord:play{degree = chord.s.degree2}
+    chord:play{degree = chord.s.degree3}
+  end
+}
+
+
+
+
 
 a4 = vox:new{
   synth = vox.midisynth,
@@ -101,7 +144,6 @@ a4 = vox:new{
 
 a4.s = {
   div = s{32,3,5,1,5}
-  -- on = s{true,false} -- i don't think this works in an expected way
 }
 
 a4.l = l:new_pattern{
@@ -115,11 +157,10 @@ a4.seq = seq:new{
   div = 3,
   seq = {s{11,5,13},10,9,7,s{6,4,3}},
   action = function(val)
-    a4:play{degree = val}--, on = a4.s.on}
+    a4:play{degree = val}
   end
 }
 
 
 
-
-voices = {bass, a4}
+voices = {bass, chord, a4}
