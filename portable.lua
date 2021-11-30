@@ -1,7 +1,7 @@
 -- dl
 
 function reload()
-  norns.script.load('code/dl/travel.lua')
+  norns.script.load('code/dl/portable.lua')
 end
 
 function r() norns.script.load(norns.script.state) end
