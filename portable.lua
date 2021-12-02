@@ -50,13 +50,13 @@ bass = vox:new{
   device = midi.connect(1),
   channel = 1,
   on = true,
-  octave = 4,
+  octave = 5,
   scale = 'lydian',
   length = 1/4
 }
 
 bass.user = {
-  cutoff = 0.5
+  cutoff = 0.4
 }
 
 bass.action = function(self, args)
@@ -65,24 +65,31 @@ bass.action = function(self, args)
 end
 
 bass.s = {
-  div = s{4,1,1,2},
+  div = s{4,3,1},
   cutoff = s{0.5,0.7,0.5,0.7,0.6}
 }
 
 bass.l = l:new_pattern{
   division = 1/16,
   action = function()
-    bass.seq:play{div = bass.s.div}
+    local a = bass.seq:play{div = bass.s.div}
+    -- the below doesnt work, but it would be nice if it did
+    -- add a property to seq which says if the val returned a note the last time
+    -- if not a then 
+    --   local b = bass2.seq:play{div = bass2.s.div}
+    -- end
   end
 }
 
 bass.seq = seq:new{
   div = 2,
-  seq = {1,5,1,8},
+  seq = {1},
   action = function(val)
     bass:play{degree = val, user = {cutoff = bass.s.cutoff}}
   end
 }
+
+
 
 bass.device.event = function(data)
   local msg = midi.to_msg(data)
@@ -92,6 +99,51 @@ bass.device.event = function(data)
     -- end
   end
 end
+
+
+
+bass2 = vox:new{
+  synth = vox.midisynth,
+  device = midi.connect(1),
+  channel = 1,
+  on = true,
+  octave = 6,
+  scale = 'lydian',
+  length = 1/4,
+  level = 0.5
+}
+
+bass2.user = {
+  cutoff = 0.4
+}
+
+bass2.action = function(self, args)
+  args.user.cutoff = math.ceil(self.user.cutoff * args.user.cutoff() * 127)
+  args.device:cc(23, args.user.cutoff, args.channel)
+end
+
+bass2.s = {
+  div = s{1,2,2,1},
+  cutoff = s{0.5,0.7,0.5,0.7,0.6}
+}
+
+-- bass2.l = l:new_pattern{
+--   division = 1/16,
+--   action = function()
+--     bass2.seq:play{div = bass2.s.div}
+--   end
+-- }
+
+bass2.seq = seq:new{
+  div = 1,
+  seq = {1,5,1,s{8,11,13}},
+  step = 1,
+  action = function(val)
+    bass2:play{degree = val, user = {cutoff = bass2.s.cutoff}}
+  end
+}
+
+
 
 
 
