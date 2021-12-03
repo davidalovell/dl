@@ -26,12 +26,17 @@ function sync(sync, fn)
   return clock.run(function() clock.sync(sync); fn() end)
 end
 
+function wait(wait, fn)
+  return clock.run(function() clock.sleep(clock.get_beat_sec() * wait); fn() end)
+end
+
 
 
 
 
 function clock.transport.start()
   l:start()
+  print('start')
 end
 
 function clock.transport.stop()
@@ -49,7 +54,7 @@ bass = vox:new{
   synth = vox.midisynth,
   device = midi.connect(1),
   channel = 1,
-  on = true,
+  on = false,
   octave = 4,
   scale = 'lydian',
   length = 1/4
@@ -100,7 +105,7 @@ chord = vox:new{
   synth = vox.midisynth,
   device = midi.connect(1),
   channel = 2,
-  on = true,
+  on = false,
   octave = 4,
   scale = 'lydian',
   length = 4
@@ -137,7 +142,7 @@ a4 = vox:new{
   synth = vox.midisynth,
   device = midi.connect(2),
   channel = 1,
-  on = true,
+  on = false,
   scale = 'lydian',
   length = 1/4
 }
@@ -163,4 +168,99 @@ a4.seq = seq:new{
 
 
 
-voices = {bass, chord, a4}
+bd = vox:new{
+  synth = vox.midisynth,
+  device = midi.connect(3),
+  channel = 1,
+  on = false
+}
+
+bd.s = {
+  div = s{8,8,8,5,3}
+}
+
+bd.l = l:new_pattern{
+  division = 1/16,
+  action = function()
+    bd.seq:play{div = bd.s.div}
+  end
+}
+
+bd.seq = seq:new{
+  div = 1,
+  seq = {1},
+  action = function(val)
+    bd:play()
+  end
+}
+
+cym = vox:new{
+  synth = vox.midisynth,
+  device = midi.connect(3),
+  channel = 3,
+  on = true
+}
+
+
+
+
+
+voices = {bass, chord, a4, bd}
+
+
+
+
+
+
+
+
+function init()
+  p0()
+end
+
+function p0()
+  sync(1, function() chord.on = true end)
+end
+
+function p1()
+  sync(8, function() bass.on = true end)
+end
+
+function p2()
+  sync(8, function() a4.on = true; bd.on = true end)
+end
+
+function p3()
+  sync(8,
+    function()
+      bd:play()
+      bd.on = false
+      bass.on = false
+      wait(3, function() cym:play() end)
+    end
+  )
+end
+
+function p4()
+  sync(8, function() bd.on = true; bass.on = true end)
+end
+
+function p5()
+  sync(8,
+    function()
+      bd.on = false
+      chord:play{degree = chord.s.degree1}
+      chord:play{degree = chord.s.degree2}
+      chord:play{degree = chord.s.degree3}
+      chord.on = false
+    end
+  )
+end
+
+function p6()
+  bass.on = false
+end
+
+function p7()
+  a4.on = false
+end

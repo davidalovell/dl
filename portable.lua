@@ -60,8 +60,8 @@ bass.user = {
 }
 
 bass.action = function(self, args)
-  args.user.cutoff = math.ceil(self.user.cutoff * args.user.cutoff() * 127)
-  args.device:cc(23, args.user.cutoff, args.channel)
+  -- args.user.cutoff = math.ceil(self.user.cutoff * args.user.cutoff() * 127)
+  -- args.device:cc(23, args.user.cutoff, args.channel)
 end
 
 bass.s = {
