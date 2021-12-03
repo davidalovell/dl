@@ -194,18 +194,40 @@ bd.seq = seq:new{
   end
 }
 
+
+
+
 cym = vox:new{
   synth = vox.midisynth,
   device = midi.connect(3),
   channel = 3,
-  on = true
+  on = false
+}
+
+cym.s = {
+  div = s{32,26,1,5},
+  level = s{1,0.5,0.7}
+}
+
+cym.l = l:new_pattern{
+  division = 1/16,
+  action = function()
+    cym.seq:play{div = cym.s.div}
+  end
+}
+
+cym.seq = seq:new{
+  div = 1,
+  offset = 4,
+  seq = {1},
+  action = function(val)
+    cym:play{level = cym.s.level}
+  end
 }
 
 
 
-
-
-voices = {bass, chord, a4, bd}
+voices = {bass, chord, a4, bd, cym}
 
 
 
@@ -236,13 +258,13 @@ function p3()
       bd:play()
       bd.on = false
       bass.on = false
-      wait(3, function() cym:play() end)
+      wait(3, function() cym.on = true; cym:play(); cym.on = false end)
     end
   )
 end
 
 function p4()
-  sync(8, function() bd.on = true; bass.on = true end)
+  sync(8, function() bd.on = true; bass.on = true; cym.on = true end)
 end
 
 function p5()
@@ -253,6 +275,8 @@ function p5()
       chord:play{degree = chord.s.degree2}
       chord:play{degree = chord.s.degree3}
       chord.on = false
+      cym:play()
+      cym.on = false
     end
   )
 end
