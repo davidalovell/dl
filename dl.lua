@@ -1,5 +1,10 @@
--- dl
+-- dl song (file #30)
+-- see blog post for more info
 
+
+
+
+-- reload fns
 function reload()
   norns.script.load('code/dl/dl.lua')
 end
@@ -7,21 +12,25 @@ end
 function r() norns.script.load(norns.script.state) end
 
 function key(n,z)
-  -- key actions: n = number, z = state
   if n == 3 and z == 1 then
     r()
   end
 end
 
-sequins = include('lib/sequins_unnested'); s = sequins
+
+
+
+-- libs
+sequins = include('lib/sequins_unnested'); s = sequins -- hacked version of sequins
 lattice = include('lib/lattice_1.2'); l = lattice:new()
-vox = include('lib/vox')
-seq = include('lib/seq')
+vox = include('lib/vox') -- voice object
+seq = include('lib/seq') -- wrapper object for sequins too allow added functionality
 musicutil = require('musicutil')
 
 
 
 
+-- clock helper fns
 function sync(sync, fn)
   return clock.run(function() clock.sync(sync); fn() end)
 end
@@ -33,10 +42,9 @@ end
 
 
 
-
+-- transport fns, digitone is master clock
 function clock.transport.start()
   l:start()
-  print('start')
 end
 
 function clock.transport.stop()
@@ -48,8 +56,8 @@ end
 
 
 
-
--- typical contstruct
+-- objects (vox, sequins, lattice, seq), vox is the main object and other objects are stored in its table
+-- bass is a voice on digitone
 bass = vox:new{
   synth = vox.midisynth,
   device = midi.connect(1),
@@ -89,18 +97,7 @@ bass.seq = seq:new{
   end
 }
 
-bass.device.event = function(data)
-  local msg = midi.to_msg(data)
-  if msg.type == 'cc' then
-    -- if msg.cc == 70 then
-    --   bass.seq.skip = math.floor(msg.val) + 1
-    -- end
-  end
-end
-
-
-
-
+-- chord is a pad voice on digitone
 chord = vox:new{
   synth = vox.midisynth,
   device = midi.connect(1),
@@ -134,10 +131,7 @@ chord.seq = seq:new{
   end
 }
 
-
-
-
-
+-- a4 is a lead voice on analog four
 a4 = vox:new{
   synth = vox.midisynth,
   device = midi.connect(2),
@@ -166,8 +160,7 @@ a4.seq = seq:new{
   end
 }
 
-
-
+-- bd is a bass drum on digitakt
 bd = vox:new{
   synth = vox.midisynth,
   device = midi.connect(3),
@@ -194,9 +187,7 @@ bd.seq = seq:new{
   end
 }
 
-
-
-
+-- cym is a cymbal on digitakt
 cym = vox:new{
   synth = vox.midisynth,
   device = midi.connect(3),
@@ -225,17 +216,13 @@ cym.seq = seq:new{
   end
 }
 
-
-
+-- table of the above objects, doing this allows the reset fns to work
 voices = {bass, chord, a4, bd, cym}
 
 
 
 
-
-
-
-
+-- functions that are called live to play the song
 function init()
   p0()
 end
