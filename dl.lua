@@ -1,5 +1,5 @@
--- dl song (file #30)
--- see blog post for more info
+-- norns recording 30
+-- see readme
 
 
 
