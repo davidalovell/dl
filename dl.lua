@@ -72,29 +72,77 @@ bass.user = {
 }
 
 bass.action = function(self, args)
+  -- args.user.cutoff = args.user.cutoff == nil and 0.5 or args.user.cutoff
   -- args.user.cutoff = math.ceil(self.user.cutoff * args.user.cutoff() * 127)
   -- args.device:cc(23, args.user.cutoff, args.channel)
 end
 
 bass.s = {
-  div = s{1},
+  div = s{4},
   -- cutoff = s{0.5,0.7,0.5,0.7,0.6}
 }
 
 bass.l = l:new_pattern{
   division = 1/16,
   action = function()
-    bass.seq:play{div = bass.s.div}
+    local root = bass.seq:play{div = bass.s.div}
+    if not root then
+      bass2.seq:play{div = bass2.s.div}
+    end
   end
 }
 
 bass.seq = seq:new{
-  div = 2,
+  div = 1,
   seq = {1},
   action = function(val)
     bass:play{degree = val} --, user = {cutoff = bass.s.cutoff}}
   end
 }
+
+
+
+
+bass2 = vox:new{
+  synth = vox.midisynth,
+  device = midi.connect(1),
+  channel = 1,
+  on = false,
+  octave = 5,
+  scale = 'lydian',
+  length = 1/4
+}
+
+bass2.user = {
+  -- cutoff = 0.5
+}
+
+bass2.action = function(self, args)
+  -- args.user.cutoff = args.user.cutoff == nil and 0.5 or args.user.cutoff
+  -- args.user.cutoff = math.ceil(self.user.cutoff * args.user.cutoff() * 127)
+  -- args.device:cc(23, args.user.cutoff, args.channel)
+end
+
+bass2.s = {
+  div = s{4,1,2,1,1,5,3},
+  -- cutoff = s{0.5,0.7,0.5,0.7,0.6}
+}
+
+bass2.seq = seq:new{
+  div = 1,
+  seq = {1,3,5,7,8},
+  action = function(val)
+    bass2:play{degree = val} --, user = {cutoff = bass.s.cutoff}}
+  end
+}
+
+
+
+
+
+
+
+
 
 -- chord is a pad voice on digitone
 chord = vox:new{
@@ -141,7 +189,10 @@ voices = {bass, chord}
 
 -- functions that are called live to play the song
 function init()
+  p0()
 end
 
 function p0()
+  bass.on = true
+  bass2.on = true
 end

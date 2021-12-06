@@ -102,19 +102,17 @@ function Seq:play(args)
     return
   end
   
-  if self.action then
-    return self.action(self.val)
-  else
-    return self.val
-  end
+  -- if self.action then
+  --   return self.action(self.val)
+  -- else
+  --   return self.val
+  -- end
   
-  --[[
   if self.action then
     self.action(self.val)
   end
   
   return self.val
-  ]]
 end
 
 function Seq:reset()
