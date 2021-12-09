@@ -63,6 +63,7 @@ bass = vox:new{
   channel = 1,
   on = false,
   octave = 4,
+  level = 1,
   scale = 'lydian',
   length = 1/4
 }
@@ -78,7 +79,7 @@ bass.action = function(self, args)
 end
 
 bass.s = {
-  div = s{4},
+  div = s{1,7},
   -- cutoff = s{0.5,0.7,0.5,0.7,0.6}
 }
 
@@ -94,7 +95,7 @@ bass.l = l:new_pattern{
 
 bass.seq = seq:new{
   div = 1,
-  seq = {1},
+  seq = {2,6,8,6,9},
   action = function(val)
     bass:play{degree = val} --, user = {cutoff = bass.s.cutoff}}
   end
@@ -109,6 +110,7 @@ bass2 = vox:new{
   channel = 1,
   on = false,
   octave = 5,
+  level = 0.6,
   scale = 'lydian',
   length = 1/4
 }
@@ -182,7 +184,7 @@ chord.seq = seq:new{
 
 
 -- table of the above objects, doing this allows the reset fns to work
-voices = {bass, chord}
+voices = {bass, bass2, chord}
 
 
 
