@@ -62,7 +62,7 @@ bass = vox:new{
   device = midi.connect(1),
   channel = 1,
   on = false,
-  octave = 4,
+  octave = 3,
   level = 1,
   scale = 'lydian',
   length = 1/4
@@ -109,7 +109,7 @@ bass2 = vox:new{
   device = midi.connect(1),
   channel = 1,
   on = false,
-  octave = 5,
+  octave = 4,
   level = 0.6,
   scale = 'lydian',
   length = 1/4
@@ -151,16 +151,16 @@ chord = vox:new{
   synth = vox.midisynth,
   device = midi.connect(1),
   channel = 2,
-  on = false,
-  octave = 4,
+  on = true,
+  octave = 5,
   scale = 'lydian',
   length = 4
 }
 
 chord.s = {
-  degree1 = s{1},
-  degree2 = s{5},
-  degree3 = s{8}
+  degree1 = s{1,1},
+  degree2 = s{5,4},
+  degree3 = s{9,11}
 }
 
 chord.l = l:new_pattern{
@@ -174,9 +174,9 @@ chord.l = l:new_pattern{
 chord.seq = seq:new{
   div = 64,
   action = function(val)
-    chord:play{degree = chord.s.degree1}
-    chord:play{degree = chord.s.degree2}
-    chord:play{degree = chord.s.degree3}
+    wait(math.random(), function() chord:play{degree = chord.s.degree1} end)
+    wait(math.random(), function() chord:play{degree = chord.s.degree2} end)
+    wait(math.random(), function() chord:play{degree = chord.s.degree3} end)
   end
 }
 

@@ -16,9 +16,10 @@ function Seq:new(args)
   o.prob = args.prob == nil and 1 or args.prob
   o.hold = args.hold == nil and false or args.hold
   o.abs = args.abs == nil and false or args.abs -- absolute division, default is relative division
-
   o.offset = args.offset == nil and 0 or args.offset
   o.action = args.action
+  o.action_on = args.action_on == nil and true or args.action_on
+  o.advance_on = args.advance_on == nil and true or args.advance_on
 
   o.count = - o.offset
   o.div_count = - o.offset
@@ -61,6 +62,8 @@ function Seq:play(args)
   args.prob = args.prob == nil and self.prob or args.prob
   args.hold = args.hold == nil and self.hold or args.hold
   args.abs = args.abs == nil and self.abs or args.abs
+  args.action_on = args.action_on == nil and self.action_on or args.action_on
+  args.advance_on = args.advance_on == nil and self.advance_on or args.advance_on
 
   self.count = self.count + 1
 
@@ -82,7 +85,7 @@ function Seq:play(args)
     skip_cond = self.skip_count == args.beat 
   end
   
-  if div_cond then
+  if div_cond and args.advance_on then
     self.held = false
     self.val = self.s()
   else
@@ -108,7 +111,7 @@ function Seq:play(args)
   --   return self.val
   -- end
   
-  if self.action then
+  if self.action and self.action_on then
     self.action(self.val)
   end
   
