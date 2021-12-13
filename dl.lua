@@ -79,7 +79,7 @@ bass.action = function(self, args)
 end
 
 bass.s = {
-  div = s{1,7},
+  div = s{4,4,6,2},
   -- cutoff = s{0.5,0.7,0.5,0.7,0.6}
 }
 
@@ -94,8 +94,8 @@ bass.l = l:new_pattern{
 }
 
 bass.seq = seq:new{
-  div = 1,
-  seq = {2,6,8,6,9},
+  div = 2,
+  seq = {1,1,1,9},
   action = function(val)
     bass:play{degree = val} --, user = {cutoff = bass.s.cutoff}}
   end
@@ -131,8 +131,10 @@ bass2.s = {
 }
 
 bass2.seq = seq:new{
-  div = 1,
-  seq = {1,3,5,7,8},
+  div = 2,
+  step = 2,
+  prob = 0.5,
+  seq = {1,3,5,7,9},
   action = function(val)
     bass2:play{degree = val} --, user = {cutoff = bass.s.cutoff}}
   end
@@ -151,16 +153,17 @@ chord = vox:new{
   synth = vox.midisynth,
   device = midi.connect(1),
   channel = 2,
-  on = true,
+  on = false,
   octave = 5,
   scale = 'lydian',
-  length = 4
+  length = 1
 }
 
 chord.s = {
-  degree1 = s{1,1},
-  degree2 = s{5,4},
-  degree3 = s{9,11}
+  degree1 = s{1},
+  degree2 = s{4},
+  degree3 = s{5},
+  degree4 = s{9}
 }
 
 chord.l = l:new_pattern{
@@ -174,9 +177,10 @@ chord.l = l:new_pattern{
 chord.seq = seq:new{
   div = 64,
   action = function(val)
-    wait(math.random(), function() chord:play{degree = chord.s.degree1} end)
-    wait(math.random(), function() chord:play{degree = chord.s.degree2} end)
-    wait(math.random(), function() chord:play{degree = chord.s.degree3} end)
+    wait(1/math.random(2,8), function() chord:play{degree = chord.s.degree1} end)
+    wait(1/math.random(2,8), function() chord:play{degree = chord.s.degree2} end)
+    wait(1/math.random(2,8), function() chord:play{degree = chord.s.degree3} end)
+    wait(1/math.random(2,8), function() chord:play{degree = chord.s.degree4} end)
   end
 }
 
@@ -197,4 +201,6 @@ end
 function p0()
   bass.on = true
   bass2.on = true
+  bass2.seq.action_on = true
+  chord.on = true
 end
