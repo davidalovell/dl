@@ -161,9 +161,9 @@ chord = vox:new{
 
 chord.s = {
   degree1 = s{1},
-  degree2 = s{4},
+  degree2 = s{3},
   degree3 = s{5},
-  degree4 = s{9}
+  degree4 = s{7}
 }
 
 chord.l = l:new_pattern{
@@ -177,10 +177,10 @@ chord.l = l:new_pattern{
 chord.seq = seq:new{
   div = 64,
   action = function(val)
-    wait(1/math.random(2,8), function() chord:play{degree = chord.s.degree1} end)
-    wait(1/math.random(2,8), function() chord:play{degree = chord.s.degree2} end)
-    wait(1/math.random(2,8), function() chord:play{degree = chord.s.degree3} end)
-    wait(1/math.random(2,8), function() chord:play{degree = chord.s.degree4} end)
+    wait(1/math.random(1,4), function() chord:play{degree = chord.s.degree1} end)
+    wait(1/math.random(1,4), function() chord:play{degree = chord.s.degree2} end)
+    wait(1/math.random(1,4), function() chord:play{degree = chord.s.degree3} end)
+    wait(1/math.random(1,4), function() chord:play{degree = chord.s.degree4} end)
   end
 }
 
