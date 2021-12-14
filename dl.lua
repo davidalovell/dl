@@ -112,7 +112,8 @@ bass2 = vox:new{
   octave = 4,
   level = 0.6,
   scale = 'lydian',
-  length = 1/4
+  length = 1/4,
+  wrap = true
 }
 
 bass2.user = {
@@ -156,7 +157,8 @@ chord = vox:new{
   on = false,
   octave = 5,
   scale = 'lydian',
-  length = 1
+  length = 2,
+  wrap = true,
 }
 
 chord.s = {
