@@ -66,7 +66,7 @@ function Vox:play(args)
   args.length = self.length * (args.length == nil and 1 or args.length)
   args.channel = args.channel == nil and self.channel or args.channel
   args.device = args.device == nil and self.device or args.device
-  args.user = self.user == nil and self.user or args.user
+  args.user = args.user == nil and self.user or args.user
 
   args.scale = type(args.scale) == 'string' and musicutil.generate_scale_of_length(0, args.scale, 7) or args.scale
   args.octave = args.wrap and args.octave or args.octave + math.floor(args.degree / #args.scale)
