@@ -21,7 +21,7 @@ end
 
 -- libs
 sequins = include('lib/sequins_unnested'); s = sequins -- hacked version of sequins
-lattice = include('lib/lattice_1.2'); l = lattice:ne∏w()
+lattice = include('lib/lattice_1.2'); l = lattice:new()
 vox = include('lib/vox') -- voice object
 seq = include('lib/seq') -- wrapper object for sequins too allow added functionality
 musicutil = require('musicutil')
@@ -187,13 +187,39 @@ chord.seq = seq:new{
 }
 
 
-crow_jf = vox:new{
-  synth = function(note, level) crow.ii.jf.play_note(note/12, level) end,
-  scale = 'lydian'
+jf = vox:new{
+  synth = function(args) crow.ii.jf.play_note(args.note/12, args.level/127) end,
+  scale = 'lydian',
+  octave = 0,
+  level = 1
+}
+
+jf.s = {
+  div = s{2,1,6,1,5,1,1},
+  -- cutoff = s{0.5,0.7,0.5,0.7,0.6}
+}
+
+jf.l = l:new_pattern{
+  division = 1/16,
+  action = function()
+    -- local root = bass.seq:play{div = bass.s.div}
+    -- if not root then
+    --   bass2.seq:play{div = bass2.s.div}
+    -- end
+    jf.seq:play{div = jf.s.div}
+  end
+}
+
+jf.seq = seq:new{
+  div = 2,
+  seq = {6,11,5,9,1,10,3,7},
+  action = function(val)
+    jf:play{degree = val} --, user = {cutoff = bass.s.cutoff}}
+  end
 }
 
 -- table of the above objects, doing this allows the reset fns to work
-voices = {bass, bass2, chord, crow_jf}
+voices = {bass, bass2, chord, jf}
 
 
 
