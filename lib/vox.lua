@@ -63,6 +63,7 @@ function Vox:play(args)
   args.synth = args.synth == nil and self.synth or args.synth
   
   args.level = math.ceil(self.level * (args.level == nil and 1 or args.level) * 127)
+  -- args.level = math.ceil(self.level * (args.level == nil and 1 or args.level)
   args.length = self.length * (args.length == nil and 1 or args.length)
   args.channel = args.channel == nil and self.channel or args.channel
   args.device = args.device == nil and self.device or args.device
