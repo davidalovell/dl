@@ -226,6 +226,7 @@ voices = {bass, bass2, chord, jf}
 
 -- functions that are called live to play the song
 function init()
+  crow.ii.jf.mode(1)
   p0()
 end
 
