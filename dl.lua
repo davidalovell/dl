@@ -235,4 +235,7 @@ function p0()
   bass2.on = true
   bass2.seq.action_on = true
   chord.on = true
+
+  crow.output[3].volts = 4/12
+  crow.output[4].volts = 11/12
 end
