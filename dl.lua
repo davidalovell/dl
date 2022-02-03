@@ -218,8 +218,60 @@ jf.seq = seq:new{
   end
 }
 
+mangrove1 = vox:new{
+  synth = function(args) crow.output[3].volts = args.note/12 end,
+  scale = 'lydian',
+  octave = 0
+}
+
+mangrove1.s = {
+  div = s{1}
+}
+
+mangrove1.l = l:new_pattern{
+  division = 1/4,
+  action = function()
+    mangrove1.seq:play{div = mangrove1.s.div}
+  end
+}
+
+mangrove1.seq = seq:new{
+  div = 16,
+  seq = {1,9,6,7},
+  action = function(val)
+    print('mangrove1: ', val)
+    mangrove1:play{degree = val}
+  end
+}
+
+mangrove2 = vox:new{
+  synth = function(args) crow.output[4].volts = args.note/12 end,
+  scale = 'lydian',
+  octave = 0
+}
+
+mangrove2.s = {
+  div = s{1}
+}
+
+mangrove2.l = l:new_pattern{
+  division = 1/4,
+  action = function()
+    mangrove2.seq:play{div = mangrove2.s.div}
+  end
+}
+
+mangrove2.seq = seq:new{
+  div = 24,
+  seq = {3,5,4},
+  action = function(val)
+    print('mangrove2: ', val)
+    mangrove2:play{degree = val}
+  end
+}
+
 -- table of the above objects, doing this allows the reset fns to work
-voices = {bass, bass2, chord, jf}
+voices = {bass, bass2, chord, jf, mangrove1, mangrove2}
 
 
 
@@ -235,7 +287,9 @@ function p0()
   bass2.on = true
   bass2.seq.action_on = true
   chord.on = true
+  jf.on = true
+  mangrove1.on = true
 
-  crow.output[3].volts = 4/12
-  crow.output[4].volts = 11/12
+  -- crow.output[3].volts = 4/12
+  -- crow.output[4].volts = 12/12
 end
