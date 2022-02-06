@@ -158,14 +158,14 @@ chord = vox:new{
   octave = 5,
   scale = 'lydian',
   length = 2,
-  wrap = true,
+  wrap = false,
 }
 
 chord.s = {
-  degree1 = s{1},
-  degree2 = s{3},
-  degree3 = s{5},
-  degree4 = s{7}
+  degree1 = s{1,1,1,2},
+  degree2 = s{3,3,2,4},
+  degree3 = s{5,5,5,6},
+  degree4 = s{7,9,11,9}
 }
 
 chord.l = l:new_pattern{
@@ -190,8 +190,8 @@ chord.seq = seq:new{
 jf = vox:new{
   synth = function(args) crow.ii.jf.play_note(args.note/12, args.level/127) end,
   scale = 'lydian',
-  octave = 0,
-  level = 1
+  octave = 1,
+  level = 0.5
 }
 
 jf.s = {
@@ -211,7 +211,7 @@ jf.l = l:new_pattern{
 }
 
 jf.seq = seq:new{
-  div = 2,
+  div = 4,
   seq = {6,11,5,9,1,10,3,7},
   action = function(val)
     jf:play{degree = val} --, user = {cutoff = bass.s.cutoff}}
@@ -221,7 +221,7 @@ jf.seq = seq:new{
 mangrove1 = vox:new{
   synth = function(args) crow.output[3].volts = args.note/12 end,
   scale = 'lydian',
-  octave = 0
+  octave = 1
 }
 
 mangrove1.s = {
@@ -237,7 +237,7 @@ mangrove1.l = l:new_pattern{
 
 mangrove1.seq = seq:new{
   div = 16,
-  seq = {1,9,6,7},
+  seq = {1,1,3,2},
   action = function(val)
     print('mangrove1: ', val)
     mangrove1:play{degree = val}
@@ -262,8 +262,8 @@ mangrove2.l = l:new_pattern{
 }
 
 mangrove2.seq = seq:new{
-  div = 24,
-  seq = {3,5,4},
+  div = 16,
+  seq = {3,5,5,6},
   action = function(val)
     print('mangrove2: ', val)
     mangrove2:play{degree = val}
