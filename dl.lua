@@ -191,11 +191,11 @@ jf = vox:new{
   synth = function(args) crow.ii.jf.play_note(args.note/12, args.level/127) end,
   scale = 'lydian',
   octave = 1,
-  level = 0.5
+  level = 0.3
 }
 
 jf.s = {
-  div = s{2,1,6,1,5,1,1},
+  div = s{2,1,6,1,5,1,8},
   -- cutoff = s{0.5,0.7,0.5,0.7,0.6}
 }
 
@@ -211,7 +211,7 @@ jf.l = l:new_pattern{
 }
 
 jf.seq = seq:new{
-  div = 4,
+  div = 3,
   seq = {6,11,5,9,1,10,3,7},
   action = function(val)
     jf:play{degree = val} --, user = {cutoff = bass.s.cutoff}}
@@ -239,7 +239,7 @@ mangrove1.seq = seq:new{
   div = 16,
   seq = {1,1,3,2},
   action = function(val)
-    print('mangrove1: ', val)
+    -- print('mangrove1: ', val)
     mangrove1:play{degree = val}
   end
 }
@@ -265,7 +265,7 @@ mangrove2.seq = seq:new{
   div = 16,
   seq = {3,5,5,6},
   action = function(val)
-    print('mangrove2: ', val)
+    -- print('mangrove2: ', val)
     mangrove2:play{degree = val}
   end
 }
@@ -279,6 +279,8 @@ voices = {bass, bass2, chord, jf, mangrove1, mangrove2}
 -- functions that are called live to play the song
 function init()
   crow.ii.jf.mode(1)
+  crow.output[3].slew = 0.4
+  crow.output[4].slew = 0.4
   p0()
 end
 
