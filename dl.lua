@@ -219,7 +219,10 @@ jf.seq = seq:new{
 }
 
 mangrove1 = vox:new{
-  synth = function(args) crow.output[3].volts = args.note/12 end,
+  synth = function(args)
+    crow.output[3].volts = args.note/12
+    -- crow.output[2](true)
+  end,
   scale = 'lydian',
   octave = 1
 }
@@ -245,7 +248,10 @@ mangrove1.seq = seq:new{
 }
 
 mangrove2 = vox:new{
-  synth = function(args) crow.output[4].volts = args.note/12 end,
+  synth = function(args)
+    crow.output[4].volts = args.note/12
+    -- crow.output[2](true)
+  end,
   scale = 'lydian',
   octave = 0
 }
@@ -279,6 +285,7 @@ voices = {bass, bass2, chord, jf, mangrove1, mangrove2}
 -- functions that are called live to play the song
 function init()
   crow.ii.jf.mode(1)
+  -- crow.output[2].action = adsr()
   crow.output[3].slew = 0.4
   crow.output[4].slew = 0.4
   p0()
@@ -291,7 +298,22 @@ function p0()
   chord.on = true
   jf.on = true
   mangrove1.on = true
+  mangrove2.on = true
 
   -- crow.output[3].volts = 4/12
   -- crow.output[4].volts = 12/12
+end
+
+
+-- arrangement
+function p1()
+  bass.on = true
+  bass2.on = true
+  bass2.action_on = false
+  chord.on = true
+
+  -- fade this up using cold mac
+  mangrove1.on = true
+  mangrove2.on = true
+  
 end
