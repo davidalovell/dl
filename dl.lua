@@ -315,5 +315,7 @@ function p1()
   -- fade this up using cold mac
   mangrove1.on = true
   mangrove2.on = true
+
+  jf.seq.seq = {6,11,5,9,1,10,3,s{7,14}}
   
 end
