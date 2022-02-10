@@ -288,10 +288,11 @@ function init()
   -- crow.output[2].action = adsr()
   crow.output[3].slew = 0.4
   crow.output[4].slew = 0.4
+  crow.output[4].volts = 4/12
   p0()
 end
 
-function p0()
+function p_old()
   bass.on = true
   bass2.on = true
   bass2.seq.action_on = true
@@ -304,18 +305,34 @@ function p0()
   -- crow.output[4].volts = 12/12
 end
 
-
 -- arrangement
+function p0()
+  bass.on = true
+  bass2.on = true
+  chord.on = false
+  jf.on = false
+  mangrove1.on = true
+  mangrove2.on = true
+end
+
 function p1()
   bass.on = true
   bass2.on = true
-  bass2.action_on = false
   chord.on = true
+end
 
-  -- fade this up using cold mac
-  mangrove1.on = true
-  mangrove2.on = true
+function p2()
+  jf.seq.prob = 0.7
+  jf.on = true
+end
 
+function p3()
+  jf.seq.prob = 1
+  jf.seq.skip = 1
   jf.seq.seq = {6,11,5,9,1,10,3,s{7,14}}
-  
+end
+
+
+function p(fn)
+  sync(4,fn)
 end
