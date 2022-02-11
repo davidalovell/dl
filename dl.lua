@@ -288,6 +288,7 @@ function init()
   -- crow.output[2].action = adsr()
   crow.output[3].slew = 0.4
   crow.output[4].slew = 0.4
+  crow.output[3].volts = 0/12
   crow.output[4].volts = 4/12
   p0()
 end
@@ -308,8 +309,9 @@ end
 -- arrangement
 function p0()
   bass.on = true
-  bass2.on = true
-  chord.on = false
+  bass2.on = false
+  bass2.seq.div = 4
+  chord.on = true
   jf.on = false
   mangrove1.on = true
   mangrove2.on = true
@@ -318,18 +320,34 @@ end
 function p1()
   bass.on = true
   bass2.on = true
-  chord.on = true
+  bass2.seq.div = 4
 end
 
 function p2()
+
   jf.seq.prob = 0.7
   jf.on = true
 end
 
 function p3()
+  bass2.seq.div = 2
   jf.seq.prob = 1
   jf.seq.skip = 1
   jf.seq.seq = {6,11,5,9,1,10,3,s{7,14}}
+end
+
+function p4()
+  vox.set(voices, 'degree', -1)
+end
+
+function p5()
+  vox.set(voices, 'negharm', true)
+  vox.set(voices, 'degree', 5)
+end
+
+function p6()
+  vox.set(voices, 'negharm', false)
+  vox.set(voices, 'degree', 1)
 end
 
 
