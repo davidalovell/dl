@@ -36,18 +36,43 @@ function clock.wait(wait, fn)
 end
 
 
-
-
--- transport fns, digitone is master clock
-function clock.transport.start()
+function start()
   l:start()
 end
 
-function clock.transport.stop()
+function stop()
   l:stop()
   l:reset()
   vox.call(voices, 'reset')
 end
+
+-- transport fns, digitone is master clock
+function clock.transport.start()
+  start()
+end
+
+function clock.transport.stop()
+  stop()
+end
+
+
+
+
+
+
+main = l:new_pattern{
+  division = 1/16,
+  action = function()
+    local bass = bass.seq:play{div = bass.s.div}
+    if not bass then
+      local lead = lead.seq:play{div = lead.s.div}
+      if not lead then
+        local high = high.seq:play{div = high.s.div}
+      end
+    end
+  end
+}
+
 
 
 
@@ -55,12 +80,74 @@ bass = vox:new{
   synth = vox.midisynth,
   device = midi.connect(1),
   channel = 1,
+  length = 1/4,
   scale = 'lydian',
-  length = 1/4
+  octave = 4
 }
 
-voices = {bass}
+bass.s = {
+  div = s{1,2,3,1}
+}
 
+bass.seq = seq:new{
+  div = 4,
+  step = 2,
+  seq = {1,2,3,4,5,6,7},
+  action = function(val)
+    bass:play{degree = val}
+  end
+}
+
+lead = vox:new{
+  synth = vox.midisynth,
+  device = midi.connect(1),
+  channel = 1,
+  length = 1/8,
+  scale = 'lydian',
+  octave = 5
+}
+
+lead.s = {
+  div = s{1,1,1,7}
+}
+
+lead.seq = seq:new{
+  div = 1,
+  prob = 0.5,
+  seq = {1,2,3,4,5,6,7},
+  action = function(val)
+    lead:play{degree = val, step = math.random(1,6)}
+  end
+}
+
+high = vox:new{
+  synth = vox.midisynth,
+  device = midi.connect(1),
+  channel = 1,
+  length = 1/8,
+  scale = 'lydian',
+  octave = 6
+}
+
+high.s = {
+  div = s{1,2,8,1,1,1,1,16}
+}
+
+high.seq = seq:new{
+  div = 1,
+  prob = 0.5,
+  seq = {1,2,3,4,5,6,7},
+  action = function(val)
+    high:play{degree = val, step = math.random(1,6)}
+  end
+}
+
+
+
+
+
+
+voices = {bass, lead, high}
 
 
 
