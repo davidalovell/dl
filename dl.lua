@@ -2,7 +2,6 @@
 
 
 
-
 -- reload fns
 function reload()
   norns.script.load('code/dl/dl.lua')
@@ -11,7 +10,9 @@ end
 function r() norns.script.load(norns.script.state) end
 
 function key(n,z)
-  if n == 3 and z == 1 then
+  if n == 2 and z ==1 then
+    next(current_part)
+  elseif n == 3 and z == 1 then
     r()
   end
 end
@@ -29,12 +30,8 @@ musicutil = require('musicutil')
 
 
 
--- clock helper fns
-function sync(sync, fn)
-  return clock.run(function() clock.sync(sync); fn() end)
-end
-
-function wait(wait, fn)
+-- clock helper fn
+function clock.wait(wait, fn)
   return clock.run(function() clock.sleep(clock.get_beat_sec() * wait); fn() end)
 end
 
@@ -179,10 +176,10 @@ chord.l = l:new_pattern{
 chord.seq = seq:new{
   div = 64,
   action = function(val)
-    wait(1/math.random(1,4), function() chord:play{degree = chord.s.degree1} end)
-    wait(1/math.random(1,4), function() chord:play{degree = chord.s.degree2} end)
-    wait(1/math.random(1,4), function() chord:play{degree = chord.s.degree3} end)
-    wait(1/math.random(1,4), function() chord:play{degree = chord.s.degree4} end)
+    clock.wait(1/math.random(1,4), function() chord:play{degree = chord.s.degree1} end)
+    clock.wait(1/math.random(1,4), function() chord:play{degree = chord.s.degree2} end)
+    clock.wait(1/math.random(1,4), function() chord:play{degree = chord.s.degree3} end)
+    clock.wait(1/math.random(1,4), function() chord:play{degree = chord.s.degree4} end)
   end
 }
 
@@ -285,72 +282,95 @@ voices = {bass, bass2, chord, jf, mangrove1, mangrove2}
 -- functions that are called live to play the song
 function init()
   crow.ii.jf.mode(1)
-  -- crow.output[2].action = adsr()
-  crow.output[3].slew = 0.4
-  crow.output[4].slew = 0.4
   crow.output[3].volts = 0/12
+  crow.output[3].slew = 0.4
   crow.output[4].volts = 4/12
-  p0()
+  crow.output[4].slew = 0.4
+  
+  current_part = 1
+  parts = 7
+  next(current_part)
 end
 
-function p_old()
-  bass.on = true
-  bass2.on = true
-  bass2.seq.action_on = true
-  chord.on = true
-  jf.on = true
-  mangrove1.on = true
-  mangrove2.on = true
 
-  -- crow.output[3].volts = 4/12
-  -- crow.output[4].volts = 12/12
-end
 
 -- arrangement
-function p0()
-  bass.on = true
-  bass2.on = false
-  bass2.seq.div = 4
-  chord.on = true
-  jf.on = false
-  mangrove1.on = true
-  mangrove2.on = true
-end
-
-function p1()
-  bass.on = true
-  bass2.on = true
-  bass2.seq.div = 4
-end
-
-function p2()
-
-  jf.seq.prob = 0.7
-  jf.on = true
-end
-
-function p3()
-  bass2.seq.div = 2
-  jf.seq.prob = 1
-  jf.seq.skip = 1
-  jf.seq.seq = {6,11,5,9,1,10,3,s{7,14}}
-end
-
-function p4()
-  vox.set(voices, 'degree', -1)
-end
-
-function p5()
-  vox.set(voices, 'negharm', true)
-  vox.set(voices, 'degree', 5)
-end
-
-function p6()
-  vox.set(voices, 'negharm', false)
-  vox.set(voices, 'degree', 1)
-end
 
 
-function p(fn)
-  sync(4,fn)
+function next(part, beat)
+  beat = beat == nil and 4 or beat
+
+  if part == 1 then
+    clock.run(
+      function()
+        clock.sync(beat)
+        bass.on = true
+        bass2.on = false
+        bass2.seq.div = 4
+        chord.on = true
+        jf.on = false
+        mangrove1.on = true
+        mangrove2.on = true
+      end
+    )
+
+  elseif part == 2 then
+    clock.run(
+      function()
+        clock.sync(beat)
+        bass.on = true
+        bass2.on = true
+        bass2.seq.div = 4
+      end
+    )
+
+  elseif part == 3 then
+    clock.run(
+      function()
+        clock.sync(beat)
+        jf.seq.prob = 0.7
+        jf.on = true
+      end
+    )
+
+  elseif part == 4 then
+    clock.run(
+      function()
+        clock.sync(beat)
+        bass2.seq.div = 2
+        jf.seq.prob = 1
+        jf.seq.skip = 1
+        jf.seq.seq = {6,11,5,9,1,10,3,s{7,14}}
+      end
+    )
+
+  elseif part == 5 then
+    clock.run(
+      function()
+        clock.sync(beat)
+        vox.set(voices, 'degree', -1)
+      end
+    )
+
+  elseif part == 6 then
+    clock.run(
+      function()
+        clock.sync(beat)
+        vox.set(voices, 'negharm', true)
+        vox.set(voices, 'degree', 5)
+      end
+    )
+
+  elseif part == 7 then
+    clock.run(
+      function()
+        clock.sync(beat)
+        vox.set(voices, 'negharm', false)
+        vox.set(voices, 'degree', 1)
+      end
+    )
+  end
+
+  print(current_part)
+  current_part = current_part % parts + 1
 end
