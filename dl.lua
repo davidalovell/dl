@@ -11,7 +11,7 @@ function r() norns.script.load(norns.script.state) end
 
 function key(n,z)
   if n == 2 and z ==1 then
-    next(current_part)
+    start()
   elseif n == 3 and z == 1 then
     r()
   end
@@ -126,7 +126,7 @@ high = vox:new{
   channel = 1,
   length = 1/8,
   scale = 'lydian',
-  octave = 6
+  octave = 7
 }
 
 high.s = {
@@ -135,7 +135,7 @@ high.s = {
 
 high.seq = seq:new{
   div = 1,
-  prob = 0.5,
+  prob = 0.75,
   seq = {1,2,3,4,5,6,7},
   action = function(val)
     high:play{degree = val, step = math.random(1,6)}
