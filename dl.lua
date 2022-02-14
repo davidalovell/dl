@@ -316,7 +316,7 @@ function next(part, beat)
     clock.run(
       function()
         clock.sync(beat)
-        jf.seq.seq = {11,10,9,6,5,3,1,8}
+        jf.seq.seq = {6,11,5,9,1,10,3,7}
         jf.seq.div = 3
         jf.seq.prob = 0.7
         jf.on = true
@@ -331,7 +331,7 @@ function next(part, beat)
         jf.seq.prob = 1
         jf.seq.div = 2
         -- jf.seq.seq = {6,11,5,9,1,10,3,s{7,14}}
-        -- jf.seq.seq = {11,10,9,6,5,3,1,8}
+        jf.seq.seq = {11,10,9,6,5,3,1,8}
         jf.s.div:settable{2,1,1,1,1,2,3,16}
         jf.s.octave:settable{0,s{1}:every(5)}
       end
