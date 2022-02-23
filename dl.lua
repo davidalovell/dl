@@ -31,8 +31,9 @@ musicutil = require('musicutil')
 
 
 -- clock helper fn
-function clock.wait(wait, fn)
-  return clock.run(function() clock.sleep(clock.get_beat_sec() * wait); fn() end)
+function clock.wait(wait)
+  -- return clock.run(function() clock.sleep(clock.get_beat_sec() * wait); fn() end)
+  return clock.sleep(clock.get_beat_sec() * wait)
 end
 
 
@@ -76,7 +77,7 @@ bass.action = function(self, args)
 end
 
 bass.s = {
-  div = s{4,4,6,2},
+  div = s{4,4,6,2}
   -- cutoff = s{0.5,0.7,0.5,0.7,0.6}
 }
 
@@ -92,7 +93,7 @@ bass.l = l:new_pattern{
 
 bass.seq = seq:new{
   div = 2,
-  seq = {1,1,1,9},
+  seq = {1,1,1,9, 1,1,1,9, 1,1,1,9, 1,1,1,9, 1,1,1,9, 1,1,1,9, 2,2,2,9, 2,2,6,13},
   action = function(val)
     bass:play{degree = val} --, user = {cutoff = bass.s.cutoff}}
   end
@@ -176,10 +177,19 @@ chord.l = l:new_pattern{
 chord.seq = seq:new{
   div = 64,
   action = function(val)
-    clock.wait(1/math.random(1,4), function() chord:play{degree = chord.s.degree1} end)
-    clock.wait(1/math.random(1,4), function() chord:play{degree = chord.s.degree2} end)
-    clock.wait(1/math.random(1,4), function() chord:play{degree = chord.s.degree3} end)
-    clock.wait(1/math.random(1,4), function() chord:play{degree = chord.s.degree4} end)
+    clock.run(
+      function()
+        clock.wait(1)
+        clock.sleep(math.random()/10)
+        chord:play{degree = chord.s.degree1}
+        clock.sleep(math.random()/10)
+        chord:play{degree = chord.s.degree2}
+        clock.sleep(math.random()/10)
+        chord:play{degree = chord.s.degree3}
+        clock.sleep(math.random()/10)
+        chord:play{degree = chord.s.degree4}
+      end
+    )
   end
 }
 
@@ -193,16 +203,12 @@ jf = vox:new{
 
 jf.s = {
   div = s{2,1,6,1,5,1,8},
-  -- cutoff = s{0.5,0.7,0.5,0.7,0.6}
+  octave = s{0}
 }
 
 jf.l = l:new_pattern{
   division = 1/16,
   action = function()
-    -- local root = bass.seq:play{div = bass.s.div}
-    -- if not root then
-    --   bass2.seq:play{div = bass2.s.div}
-    -- end
     jf.seq:play{div = jf.s.div}
   end
 }
@@ -211,14 +217,20 @@ jf.seq = seq:new{
   div = 3,
   seq = {6,11,5,9,1,10,3,7},
   action = function(val)
-    jf:play{degree = val} --, user = {cutoff = bass.s.cutoff}}
+    clock.run(
+      function()
+        clock.sleep(math.random()/10)
+        jf:play{degree = val, octave = jf.s.octave}
+      end
+    )
+    -- jf:play{degree = val, octave = jf.s.octave}
   end
 }
 
 mangrove1 = vox:new{
   synth = function(args)
+    crow.output[2]()
     crow.output[3].volts = args.note/12
-    -- crow.output[2](true)
   end,
   scale = 'lydian',
   octave = 1
@@ -237,9 +249,8 @@ mangrove1.l = l:new_pattern{
 
 mangrove1.seq = seq:new{
   div = 16,
-  seq = {1,1,3,2},
+  seq = {1,5,3,2},
   action = function(val)
-    -- print('mangrove1: ', val)
     mangrove1:play{degree = val}
   end
 }
@@ -247,7 +258,6 @@ mangrove1.seq = seq:new{
 mangrove2 = vox:new{
   synth = function(args)
     crow.output[4].volts = args.note/12
-    -- crow.output[2](true)
   end,
   scale = 'lydian',
   octave = 0
@@ -266,9 +276,8 @@ mangrove2.l = l:new_pattern{
 
 mangrove2.seq = seq:new{
   div = 16,
-  seq = {3,5,5,6},
+  seq = {3,1,5,6},
   action = function(val)
-    -- print('mangrove2: ', val)
     mangrove2:play{degree = val}
   end
 }
@@ -282,6 +291,7 @@ voices = {bass, bass2, chord, jf, mangrove1, mangrove2}
 -- functions that are called live to play the song
 function init()
   crow.ii.jf.mode(1)
+  crow.output[2].action = "ar(0.1, 6, linear)"
   crow.output[3].volts = 0/12
   crow.output[3].slew = 0.4
   crow.output[4].volts = 4/12
@@ -305,7 +315,7 @@ function next(part, beat)
       function()
         clock.sync(beat)
         bass.on = true
-        bass2.on = false
+        bass2.on = true
         bass2.seq.div = 4
         chord.on = true
         jf.on = false
@@ -318,9 +328,10 @@ function next(part, beat)
     clock.run(
       function()
         clock.sync(beat)
-        bass.on = true
-        bass2.on = true
-        bass2.seq.div = 4
+        jf.seq.seq = {6,11,5,9,1,10,3,7}
+        jf.seq.div = 3
+        jf.seq.prob = 0.7
+        jf.on = true
       end
     )
 
@@ -328,8 +339,13 @@ function next(part, beat)
     clock.run(
       function()
         clock.sync(beat)
-        jf.seq.prob = 0.7
-        jf.on = true
+        bass2.seq.div = 2
+        jf.seq.prob = 1
+        jf.seq.div = 2
+        -- jf.seq.seq = {6,11,5,9,1,10,3,s{7,14}}
+        jf.seq.seq = {12,10,9,6,5,3,2}
+        jf.s.div:settable{2,1,1,1,1,2,3,16}
+        jf.s.octave:settable{0,s{1}:every(5)}
       end
     )
 
@@ -337,10 +353,7 @@ function next(part, beat)
     clock.run(
       function()
         clock.sync(beat)
-        bass2.seq.div = 2
-        jf.seq.prob = 1
-        jf.seq.skip = 1
-        jf.seq.seq = {6,11,5,9,1,10,3,s{7,14}}
+        vox.set(voices, 'degree', -1)
       end
     )
 
@@ -348,7 +361,8 @@ function next(part, beat)
     clock.run(
       function()
         clock.sync(beat)
-        vox.set(voices, 'degree', -1)
+        -- jf.octave = 2
+        vox.set(voices, 'degree', 0)
       end
     )
 
@@ -356,16 +370,9 @@ function next(part, beat)
     clock.run(
       function()
         clock.sync(beat)
-        vox.set(voices, 'negharm', true)
-        vox.set(voices, 'degree', 5)
-      end
-    )
-
-  elseif part == 7 then
-    clock.run(
-      function()
-        clock.sync(beat)
-        vox.set(voices, 'negharm', false)
+        jf.octave = 1
+        jf.seq.step = -1
+        jf.s.div:settable{2,1,1,1,1,2,3}
         vox.set(voices, 'degree', 1)
       end
     )
