@@ -4,7 +4,7 @@
 
 -- reload fns
 function reload()
-  norns.script.load('code/dl/dl.lua')
+  norns.script.load(' code/dl/dl.lua')
 end
 
 function r() norns.script.load(norns.script.state) end
@@ -59,6 +59,7 @@ rings = vox:new{
   device = midi.connect(4),
   channel = 1,
   scale = 'lydian',
+  octave = 3, -- 4 also sounds good
   length = 1/16
 }
 
