@@ -59,7 +59,7 @@ rings = vox:new{
   device = midi.connect(4),
   channel = 1,
   scale = 'lydian',
-  octave = 3, -- 4 also sounds good
+  octave = 4, -- 3 also sounds good - recording 75
   length = 1/16
 }
 
