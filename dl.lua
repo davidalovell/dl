@@ -82,7 +82,7 @@ bass = vox:new{
   channel = 1,
   length = 1/4,
   scale = 'lydian',
-  octave = 4
+  octave = 3
 }
 
 bass.s = {
@@ -104,7 +104,7 @@ lead = vox:new{
   channel = 1,
   length = 1/8,
   scale = 'lydian',
-  octave = 5
+  octave = 4
 }
 
 lead.s = {
@@ -126,7 +126,7 @@ high = vox:new{
   channel = 1,
   length = 1/8,
   scale = 'lydian',
-  octave = 7
+  octave = 5
 }
 
 high.s = {
