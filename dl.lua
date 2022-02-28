@@ -4,7 +4,7 @@
 
 -- reload fns
 function reload()
-  norns.script.load(' code/dl/dl.lua')
+  norns.script.load('code/dl/dl.lua')
 end
 
 function r() norns.script.load(norns.script.state) end
@@ -58,14 +58,13 @@ rings = vox:new{
   synth = vox.midisynth,
   device = midi.connect(4),
   channel = 1,
-  scale = 'lydian',
+  scale = 'mixolydian',
   octave = 4, -- 3 also sounds good - recording 75
   length = 1/16
 }
 
 rings.s = {
   div = s{1,1,2},
-  degree = s{1,2,3,4,5,6,7}
 }
 
 rings.l = l:new_pattern{
@@ -76,15 +75,41 @@ rings.l = l:new_pattern{
 }
 
 rings.seq = seq:new{
-  div = 4,
-  seq = {1,2,3,4,5,6,7},
-  step = 2,
+  div = 16,
+  seq = {6,4,1},
+  step = 1,
   action = function(val)
     rings:play{degree = val}
   end
 }
 
-voices = {rings}
+
+clk = vox:new{
+  synth = vox.midisynth,
+  device = midi.connect(4),
+  channel = 4,
+  scale = 'mixolydian',
+  octave = 5,
+  length = 1/8
+}
+
+clk.l = l:new_pattern{
+  division = 1/32,
+  action = function()
+    clk.seq:play()
+  end
+}
+
+clk.seq = seq:new{
+  div = 1,
+  seq = {1},
+  step = 1,
+  action = function(val)
+    clk:play{degree = val}
+  end
+}
+
+voices = {clk, rings}
 -- -- bass is a voice on digitone
 -- bass = vox:new{
 --   synth = vox.midisynth,
