@@ -76,7 +76,7 @@ rings.l = l:new_pattern{
 
 rings.seq = seq:new{
   div = 16,
-  seq = {6,4,1},
+  seq = {6,4,1,5,3,1,1,1,0,1,1,1},
   step = 1,
   action = function(val)
     rings:play{degree = val}
