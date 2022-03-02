@@ -1,5 +1,5 @@
 -- dl
-
+-- the code for norns recording 0077
 
 
 -- reload fns
@@ -59,7 +59,7 @@ rings = vox:new{
   device = midi.connect(4),
   channel = 1,
   scale = 'mixolydian',
-  octave = 3, -- 3 also sounds good - recording 75
+  octave = 3,
   length = 1/16
 }
 
