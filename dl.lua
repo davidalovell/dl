@@ -21,18 +21,17 @@ end
 
 
 -- libs
-sequins = include('lib/sequins_unnested'); s = sequins -- hacked version of sequins
-lattice = include('lib/lattice_1.2'); l = lattice:new()
+musicutil = require('musicutil')
 vox = include('lib/vox') -- voice object
 seq = include('lib/seq') -- wrapper object for sequins too allow added functionality
-musicutil = require('musicutil')
+sequins = include('lib/sequins_unnested'); s = sequins -- hacked version of sequins
+lattice = include('lib/lattice_1.2'); l = lattice:new()
 
 
 
 
 -- clock helper fn
 function clock.wait(wait)
-  -- return clock.run(function() clock.sleep(clock.get_beat_sec() * wait); fn() end)
   return clock.sleep(clock.get_beat_sec() * wait)
 end
 
@@ -54,62 +53,100 @@ end
 
 
 -- objects (vox, sequins, lattice, seq), vox is the main object and other objects are stored in its table
-rings = vox:new{
-  synth = vox.midisynth,
-  device = midi.connect(4),
-  channel = 1,
-  scale = 'mixolydian',
-  octave = 3,
-  length = 1/16
+main = {}
+main.s = {
+  transpose = s{1,3,5,7}:every(64,1,1)
 }
-
-rings.s = {
-  div = s{1,1,2},
-}
-
-rings.l = l:new_pattern{
-  division = 1/16,
-  action = function()
-    rings.seq:play{div = rings.s.div}
-  end
-}
-
-rings.seq = seq:new{
-  div = 16,
-  seq = {6,4,1,5,3,1,1,0,0,4,1,1},
-  step = 1,
-  action = function(val)
-    rings:play{degree = val}
-  end
-}
-
-
-clk = vox:new{
-  synth = vox.midisynth,
-  device = midi.connect(4),
-  channel = 4,
-  scale = 'mixolydian',
-  octave = 5,
-  length = 1/8
-}
-
-clk.l = l:new_pattern{
+main.l = l:new_pattern{
   division = 1/32,
   action = function()
-    clk.seq:play()
+    main.transpose = main.s.transpose()
   end
 }
 
-clk.seq = seq:new{
-  div = 1,
-  seq = {1},
-  step = 1,
+jf = vox:new{
+  synth = vox.jf,
+  octave = 0,
+  transpose = 7,
+  level = 5,
+  scale = 'minor pentatonic'
+}
+
+jf.s = {
+  div = s{1},
+  octave = s{0,1}:every(4,1,1)
+}
+
+jf.l = l:new_pattern{
+  division = 1/32,
+  action = function()
+    jf.seq:play{div = jf.s.div}
+  end
+}
+
+jf.seq = seq:new{
+  div = 2,
+  step = -1,
+  seq = {1,2,3,4,5,6,7},
   action = function(val)
-    clk:play{degree = val}
+    -- clock.run(
+    --   function()
+    --     clock.sleep(math.random()/10)
+    --     jf:play{degree = val, octave = jf.s.octave}
+    --   end
+    -- )
+    jf:play{degree = val , transpose = main.s.transpose, octave = jf.s.octave}
   end
 }
 
-voices = {clk, rings}
+mid = vox:new{
+  synth = vox.midisynth,
+  device = midi.connect(1),
+  channel = 1,
+  level = 1,
+  scale = 'major',
+  length = 1/4
+}
+
+mid.s = {
+  div = s{2,1,1},
+}
+
+mid.l = l:new_pattern{
+  division = 1/32,
+  action = function()
+    mid.seq:play{div = mid.s.div, step = math.random(1,4)}
+  end
+}
+
+mid.seq = seq:new{
+  div = 2,
+  step = 1,
+  seq = {1,4,5,4},
+  action = function(val)
+    -- clock.run(
+    --   function()
+    --     clock.sleep(math.random()/10)
+    --     jf:play{degree = val, octave = jf.s.octave}
+    --   end
+    -- )
+    mid:play{degree = val, transpose = main.transpose, octave = math.random(-1,0)}
+  end
+}
+
+voices = {jf,}
+
+
+
+
+
+
+
+
+
+
+
+
 -- -- bass is a voice on digitone
 -- bass = vox:new{
 --   synth = vox.midisynth,

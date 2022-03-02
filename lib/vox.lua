@@ -110,6 +110,18 @@ function Vox.midisynth(args)
   )
 end
 
+function Vox.jf(args)
+  crow.ii.jf.play_note(args.note/12, args.level/127)
+end
+
+function Vox.jfv(args)
+  crow.ii.jf.play_voice(args.channel, args.note/12, args.level/127)
+end
+
+function Vox.wsyn(args)
+  crow.ii.wsyn.play_note(args.note/12, args.level/127)
+end
+
 -- function Vox.apply_mask(degree, scale, mask)
 --   local ix, closest_val = degree % #scale + 1, mask[1]
 --   for _, val in ipairs(mask) do
