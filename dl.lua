@@ -140,26 +140,28 @@ mangrove1 = vox:new{
     crow.output[3].volts = args.note/12
     crow.output[4]()
   end,
-  scale = 'lydian',
+  scale = 'ionian',
   octave = 1
 }
 
 mangrove1.s = {
-  div = s{1}
+  div = s{2,1,1},
+  octave = s{0,-1}:every(2,1,1)
 }
 
 mangrove1.l = l:new_pattern{
-  division = 1/4,
+  division = 1/32,
   action = function()
     mangrove1.seq:play{div = mangrove1.s.div}
   end
 }
 
 mangrove1.seq = seq:new{
-  div = 16,
-  seq = {1,5,3,2},
+  div = 2,
+  step = -1,
+  seq = {1,4,5},
   action = function(val)
-    mangrove1:play{degree = val}
+    mangrove1:play{degree = val, transpose = main.transpose, octave = mangrove1.s.octave}
   end
 }
 
@@ -413,7 +415,7 @@ voices = {jf,mid,mangrove1}
 -- functions that are called live to play the song
 function init()
   crow.ii.jf.mode(1)
-  -- crow.output[2].action = "ar(0.1, 6, linear)"
+  crow.output[4].action = "ar(0.01, 0.2, linear)"
   -- crow.output[3].volts = 0/12
   -- crow.output[3].slew = 0.4
   -- crow.output[4].volts = 4/12
