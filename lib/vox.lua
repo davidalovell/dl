@@ -110,11 +110,11 @@ function Vox.midisynth(args)
   )
 end
 
-function Vox.jf(args)
+function Vox.jfnote(args)
   crow.ii.jf.play_note(args.note/12, args.level/127)
 end
 
-function Vox.jfv(args)
+function Vox.jfvoice(args)
   crow.ii.jf.play_voice(args.channel, args.note/12, args.level/127)
 end
 

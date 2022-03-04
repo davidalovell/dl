@@ -65,15 +65,15 @@ main.l = l:new_pattern{
 }
 
 jf = vox:new{
-  synth = vox.jf,
-  octave = 0,
+  synth = vox.jfnote,
+  octave = 1,
   transpose = 7,
   level = 5,
   scale = 'minor pentatonic'
 }
 
 jf.s = {
-  div = s{1},
+  div = s{1,1,1,1,1,10},
   octave = s{0,1}:every(4,1,1)
 }
 
@@ -104,7 +104,8 @@ mid = vox:new{
   device = midi.connect(1),
   channel = 1,
   level = 1,
-  scale = 'major',
+  octave = 5,
+  scale = 'ionian',
   length = 1/4
 }
 
@@ -134,7 +135,9 @@ mid.seq = seq:new{
   end
 }
 
-voices = {jf,}
+-- mangrove1
+
+voices = {jf,mid}
 
 
 
