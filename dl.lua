@@ -135,9 +135,35 @@ mid.seq = seq:new{
   end
 }
 
--- mangrove1
+mangrove1 = vox:new{
+  synth = function(args)
+    crow.output[3].volts = args.note/12
+    crow.output[4]()
+  end,
+  scale = 'lydian',
+  octave = 1
+}
 
-voices = {jf,mid}
+mangrove1.s = {
+  div = s{1}
+}
+
+mangrove1.l = l:new_pattern{
+  division = 1/4,
+  action = function()
+    mangrove1.seq:play{div = mangrove1.s.div}
+  end
+}
+
+mangrove1.seq = seq:new{
+  div = 16,
+  seq = {1,5,3,2},
+  action = function(val)
+    mangrove1:play{degree = val}
+  end
+}
+
+voices = {jf,mid,mangrove1}
 
 
 
