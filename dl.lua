@@ -66,14 +66,14 @@ main.l = l:new_pattern{
 
 jf = vox:new{
   synth = vox.jfnote,
-  octave = 0,
+  octave = 1,
   transpose = 7,
-  level = 5,
+  level = 0.5,
   scale = 'minor pentatonic'
 }
 
 jf.s = {
-  div = s{1,1,1,1,1,10},
+  div = s{1,1,1,1,1,36},
   octave = s{0,1}:every(4,1,1)
 }
 
@@ -159,6 +159,7 @@ mangrove1.l = l:new_pattern{
 
 mangrove1.seq = seq:new{
   div = 4,
+  skip = 2,
   step = -1,
   seq = {1,4,5},
   action = function(val)
@@ -416,7 +417,7 @@ voices = {jf,mid,mangrove1}
 -- functions that are called live to play the song
 function init()
   crow.ii.jf.mode(1)
-  crow.output[4].action = "ar(0.01, 0.3, linear)"
+  crow.output[4].action = "ar(0.01, 0.7, linear)"
   -- crow.output[3].volts = 0/12
   -- crow.output[3].slew = 0.4
   -- crow.output[4].volts = 4/12
