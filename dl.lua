@@ -55,7 +55,8 @@ end
 -- objects (vox, sequins, lattice, seq), vox is the main object and other objects are stored in its table
 main = {}
 main.s = {
-  transpose = s{0,2,4,6}:every(64,1,1)
+  -- transpose = s{0,2,4,6}:every(64,1,1)
+  transpose = s{0,3,7,5}:every(64,1,1)
 }
 main.l = l:new_pattern{
   division = 1/32,
@@ -114,12 +115,13 @@ lead = vox:new{
 
 lead.s = {
   div = s{2,1,1},
+  skip = s{1,2}:every(8,1,1)
 }
 
 lead.l = l:new_pattern{
   division = 1/32,
   action = function()
-    lead.seq:play{div = lead.s.div, step = math.random(1,4)}
+    lead.seq:play{div = lead.s.div, step = math.random(1,4), skip = lead.s.skip}
   end
 }
 
@@ -151,13 +153,14 @@ mangrove = vox:new{
 
 mangrove.s = {
   div = s{2,1,1,3},
-  octave = s{0,-1}:every(2,1,1)
+  octave = s{0,-1}:every(2,1,1),
+  skip = s{2,1}:every(8,1,1)
 }
 
 mangrove.l = l:new_pattern{
   division = 1/32,
   action = function()
-    mangrove.seq:play{div = mangrove.s.div}
+    mangrove.seq:play{div = mangrove.s.div, skip = mangrove.s.skip}
   end
 }
 
@@ -177,11 +180,11 @@ for i = 1, 4 do
     synth = vox.midisynth,
     device = midi.connect(3),
     channel = 5 + (i - 1),
-    level = 1,
-    octave = 4,
+    level = 0.6 + (i * 0.1),
+    octave = 4 - math.floor(i / 2),
     degree = 1 + (2 * i),
     scale = 'ionian',
-    length = 1/4
+    length = 1/2
   }
 
   ooh[i].s = {
