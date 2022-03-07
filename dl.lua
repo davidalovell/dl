@@ -84,7 +84,7 @@ jf.s = {
 jf.l = l:new_pattern{
   division = 1/32,
   action = function()
-    jf.seq:play{div = jf.s.div, step = math.random(1,4)}
+    jf.seq:play{div = jf.s.div, step = math.random(1,2)}
   end
 }
 
