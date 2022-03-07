@@ -55,12 +55,15 @@ end
 -- objects (vox, sequins, lattice, seq), vox is the main object and other objects are stored in its table
 main = {}
 main.s = {
-  transpose = s{1,3,5,7}:every(64,1,1)
+  transpose = s{0,2,4,6}:every(64,1,1)
 }
 main.l = l:new_pattern{
   division = 1/32,
   action = function()
     main.transpose = main.s.transpose()
+    -- for i = 1,4 do
+    --   ooh[i]:play{transpose = main.transpose}
+    -- end
   end
 }
 
@@ -80,7 +83,7 @@ jf.s = {
 jf.l = l:new_pattern{
   division = 1/32,
   action = function()
-    jf.seq:play{div = jf.s.div}
+    jf.seq:play{div = jf.s.div, step = math.random(1,4)}
   end
 }
 
@@ -99,7 +102,7 @@ jf.seq = seq:new{
   end
 }
 
-mid = vox:new{
+lead = vox:new{
   synth = vox.midisynth,
   device = midi.connect(1),
   channel = 1,
@@ -109,21 +112,22 @@ mid = vox:new{
   length = 1/4
 }
 
-mid.s = {
+lead.s = {
   div = s{2,1,1},
 }
 
-mid.l = l:new_pattern{
+lead.l = l:new_pattern{
   division = 1/32,
   action = function()
-    mid.seq:play{div = mid.s.div, step = math.random(1,4)}
+    lead.seq:play{div = lead.s.div, step = math.random(1,4)}
   end
 }
 
-mid.seq = seq:new{
+lead.seq = seq:new{
   div = 2,
   step = 1,
   offset = 1,
+  prob = 0.7,
   seq = {1,4,5,4},
   action = function(val)
     -- clock.run(
@@ -132,11 +136,11 @@ mid.seq = seq:new{
     --     jf:play{degree = val, octave = jf.s.octave}
     --   end
     -- )
-    mid:play{degree = val, transpose = main.transpose, octave = math.random(-1,0)}
+    lead:play{degree = val, transpose = main.transpose, octave = math.random(-1,0)}
   end
 }
 
-mangrove1 = vox:new{
+mangrove = vox:new{
   synth = function(args)
     crow.output[3].volts = args.note/12
     crow.output[4]()
@@ -145,29 +149,70 @@ mangrove1 = vox:new{
   octave = 0
 }
 
-mangrove1.s = {
+mangrove.s = {
   div = s{2,1,1,3},
   octave = s{0,-1}:every(2,1,1)
 }
 
-mangrove1.l = l:new_pattern{
+mangrove.l = l:new_pattern{
   division = 1/32,
   action = function()
-    mangrove1.seq:play{div = mangrove1.s.div}
+    mangrove.seq:play{div = mangrove.s.div}
   end
 }
 
-mangrove1.seq = seq:new{
+mangrove.seq = seq:new{
   div = 4,
-  skip = 2,
+  skip = 1,
   step = -1,
   seq = {1,4,5},
   action = function(val)
-    mangrove1:play{degree = val, transpose = main.transpose, octave = mangrove1.s.octave}
+    mangrove:play{degree = val, transpose = main.transpose, octave = mangrove.s.octave}
   end
 }
 
-voices = {jf,mid,mangrove1}
+ooh = {}
+for i = 1, 4 do
+  ooh[i] = vox:new{
+    synth = vox.midisynth,
+    device = midi.connect(3),
+    channel = 5 + (i - 1),
+    level = 1,
+    octave = 4,
+    degree = 1 + (2 * i),
+    scale = 'ionian',
+    length = 1/4
+  }
+
+  ooh[i].s = {
+    div = s{i},
+  }
+  
+  ooh[i].l = l:new_pattern{
+    division = 1/32,
+    action = function()
+      ooh[i].seq:play{div = ooh[i].s.div, step = math.random(1,4)}
+    end
+  }
+  
+  ooh[i].seq = seq:new{
+    div = 32,
+    step = 1,
+    offset = i - 1,
+    seq = {1},
+    action = function(val)
+      -- clock.run(
+      --   function()
+      --     clock.sleep(math.random()/10)
+      --     jf:play{degree = val, octave = jf.s.octave}
+      --   end
+      -- )
+      ooh[i]:play{degree = val, transpose = main.transpose}
+    end
+  }
+end
+
+voices = {jf,lead,mangrove,ooh[1],ooh[2],ooh[3],ooh[4]}
 
 
 
@@ -417,7 +462,7 @@ voices = {jf,mid,mangrove1}
 -- functions that are called live to play the song
 function init()
   crow.ii.jf.mode(1)
-  crow.output[4].action = "ar(0.01, 0.7, linear)"
+  crow.output[4].action = "ar(0.01, 0.02, linear)"
   -- crow.output[3].volts = 0/12
   -- crow.output[3].slew = 0.4
   -- crow.output[4].volts = 4/12
