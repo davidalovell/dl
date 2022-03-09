@@ -215,7 +215,70 @@ for i = 1, 4 do
   }
 end
 
-voices = {jf,lead,mangrove,ooh[1],ooh[2],ooh[3],ooh[4]}
+sd = vox:new{
+  synth = function(args)
+    crow.output[2]()
+  end,
+  scale = 'ionian',
+}
+
+sd.s = {
+  div = s{4} -- extra 4 because offset is included
+}
+
+sd.l = l:new_pattern{
+  division = 1/32,
+  action = function()
+    sd.seq:play{div = sd.s.div}
+  end
+}
+
+sd.seq = seq:new{
+  div = 4,
+  skip = 1,
+  offset = 4,
+  seq = {1},
+  action = function(val)
+    sd:play{degree = val}
+  end
+}
+
+hh = vox:new{
+  synth = function(args)
+    crow.output[1]()
+  end,
+  scale = 'ionian',
+}
+
+hh.s = {
+  div = s{4,4,4,4, 4,4,2,2,4, 4,4,2,1,1,4, 4,4,1,1,2,1,1,2}
+}
+
+hh.l = l:new_pattern{
+  division = 1/32,
+  action = function()
+    hh.seq:play{div = hh.s.div}--, skip = sd.s.skip}
+  end
+}
+
+hh.seq = seq:new{
+  div = 1,
+  skip = 1,
+  offset = 0,
+  seq = {1},
+  action = function(val)
+    hh:play{degree = val}
+  end
+}
+
+voices = {jf,lead,mangrove,ooh[1],ooh[2],ooh[3],ooh[4],sd,hh}
+
+
+
+
+
+
+
 
 
 
@@ -465,6 +528,8 @@ voices = {jf,lead,mangrove,ooh[1],ooh[2],ooh[3],ooh[4]}
 -- functions that are called live to play the song
 function init()
   crow.ii.jf.mode(1)
+  crow.output[1].action = "ar(0.01, 0.01, linear)"
+  crow.output[2].action = "ar(0.001, 0.001, linear)"
   crow.output[4].action = "ar(0.01, 0.02, linear)"
   -- crow.output[3].volts = 0/12
   -- crow.output[3].slew = 0.4
