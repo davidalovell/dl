@@ -1,5 +1,10 @@
 -- seq is a wrapper for sequins
 
+-- TODO
+-- there is a problem with offset
+-- sequins seems to continue to count in spite of offset
+-- there is also a problem with beat
+
 local Seq = {}
 local sequins = include('lib/sequins_dl'); s = sequins
 
@@ -36,6 +41,12 @@ function Seq:play(args)
   
   local updated_args = {}
 
+  self.count = self.count + 1
+
+  if self.count < 1 then
+    return
+  end
+
   for k, v in pairs(args) do
     if s.is_sequins(v) or type(v) == 'function' then
       if self.held == false then
@@ -65,11 +76,11 @@ function Seq:play(args)
   args.action_on = args.action_on == nil and self.action_on or args.action_on
   args.advance_on = args.advance_on == nil and self.advance_on or args.advance_on
 
-  self.count = self.count + 1
+  -- self.count = self.count + 1
 
-  if self.count < 1 then
-    return
-  end
+  -- if self.count < 1 then
+  --   return
+  -- end
   
   self.div_count = self.div_count % args.div + 1
   self.skip_count = self.skip_count % (args.skip * args.div) + 1

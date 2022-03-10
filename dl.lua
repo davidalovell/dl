@@ -215,6 +215,31 @@ for i = 1, 4 do
   }
 end
 
+bd = vox:new{
+  synth = vox.midisynth,
+  device = midi.connect(3),
+  channel = 1
+}
+
+bd.s = {
+  div = s{8}
+}
+
+bd.l = l:new_pattern{
+  division = 1/32,
+  action = function()
+    bd.seq:play{div = bd.s.div}
+  end
+}
+
+bd.seq = seq:new{
+  div = 2,
+  seq = {1},
+  action = function(val)
+    bd:play{degree = val}
+  end
+}
+
 sd = vox:new{
   synth = function(args)
     crow.output[2]()
@@ -223,7 +248,7 @@ sd = vox:new{
 }
 
 sd.s = {
-  div = s{4} -- extra 4 because offset is included
+  div = s{8}
 }
 
 sd.l = l:new_pattern{
@@ -234,7 +259,7 @@ sd.l = l:new_pattern{
 }
 
 sd.seq = seq:new{
-  div = 4,
+  div = 2,
   skip = 1,
   offset = 4,
   seq = {1},
@@ -271,7 +296,7 @@ hh.seq = seq:new{
   end
 }
 
-voices = {jf,lead,mangrove,ooh[1],ooh[2],ooh[3],ooh[4],sd,hh}
+voices = {jf,lead,mangrove,ooh[1],ooh[2],ooh[3],ooh[4],bd,sd,hh}
 
 
 
@@ -553,13 +578,10 @@ function next(part, beat)
     clock.run(
       function()
         clock.sync(beat)
-        -- bass.on = true
-        -- bass2.on = true
-        -- bass2.seq.div = 4
-        -- chord.on = true
-        -- jf.on = false
-        -- mangrove1.on = true
-        -- mangrove2.on = true
+        jf.on = false
+        lead.on = false
+        sd.on = false
+        hh.on = false
       end
     )
 
@@ -567,10 +589,8 @@ function next(part, beat)
     clock.run(
       function()
         clock.sync(beat)
-        -- jf.seq.seq = {6,11,5,9,1,10,3,7}
-        -- jf.seq.div = 3
-        -- jf.seq.prob = 0.7
-        -- jf.on = true
+        sd.on = true
+
       end
     )
 
@@ -578,6 +598,9 @@ function next(part, beat)
     clock.run(
       function()
         clock.sync(beat)
+        hh.on = true
+        jf.on = true
+
         -- bass2.seq.div = 2
         -- jf.seq.prob = 1
         -- jf.seq.div = 2
@@ -591,6 +614,7 @@ function next(part, beat)
     clock.run(
       function()
         clock.sync(beat)
+        lead.on = true
         -- vox.set(voices, 'degree', -1)
       end
     )
@@ -599,7 +623,8 @@ function next(part, beat)
     clock.run(
       function()
         clock.sync(beat)
-        -- vox.set(voices, 'degree', 0)
+        -- main.s.transpose = s{0,2,-2,4}:every(64,1,1)
+        vox.set(voices, 'negharm', true) --not great
       end
     )
 
@@ -607,10 +632,7 @@ function next(part, beat)
     clock.run(
       function()
         clock.sync(beat)
-        -- jf.octave = 1
-        -- jf.seq.step = -1
-        -- jf.s.div:settable{2,1,1,1,1,2,3}
-        -- vox.set(voices, 'degree', 1)
+        vox.set(voices, 'negharm', false)
       end
     )
   end
