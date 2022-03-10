@@ -99,7 +99,7 @@ jf.seq = seq:new{
     --     jf:play{degree = val, octave = jf.s.octave}
     --   end
     -- )
-    jf:play{degree = val , transpose = main.s.transpose, octave = jf.s.octave}
+    jf:play{degree = val , transpose = main.transpose, octave = jf.s.octave}
   end
 }
 
