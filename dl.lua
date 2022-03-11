@@ -110,7 +110,8 @@ lead = vox:new{
   level = 1,
   octave = 6,
   scale = 'ionian',
-  length = 1/4
+  length = 1/4,
+  on = false
 }
 
 lead.s = {
@@ -602,7 +603,7 @@ function init()
   -- crow.output[4].slew = 0.4
   
   current_part = 1
-  parts = 10
+  parts = 11
   next(current_part)
 end
 
@@ -701,13 +702,26 @@ function next(part, beat)
         clock.sync(beat)
         -- sd.s.div = s{8,2,6}
         sd.on = true
-        bd.seq.div = 1
+        -- bd.seq.div = 1
         main.s.transpose = s{0,3,7,5}:every(64,1,1)
         -- main.s.transpose = s{2,2,-2,0}:every(64,1,1)
       end
     )
 
   elseif part == 10 then
+    clock.run(
+      function()
+        clock.sync(beat)
+        -- sd.s.div = s{8,2,6}
+        -- bd.seq.div = 2
+        sd.on = false
+        hh.on = false
+        -- main.s.transpose = s{0,3,7,5}:every(64,1,1)
+        -- main.s.transpose = s{2,2,-2,0}:every(64,1,1)
+      end
+    )
+
+  elseif part == 11 then
     clock.run(
       function()
         clock.sync(beat)
