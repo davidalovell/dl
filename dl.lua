@@ -674,7 +674,7 @@ function next(part, beat)
     clock.run(
       function()
         clock.sync(beat)
-        ooh[3].seq.seq = {1,4,5}
+        ooh[3].seq.seq = {1,2}
       end
     )
 
