@@ -215,6 +215,46 @@ for i = 1, 4 do
   }
 end
 
+
+
+chord = vox:new{
+  synth = vox.midisynth,
+  device = midi.connect(1),
+  channel = 2,
+  octave = 5,
+  scale = 'ionian',
+  length = 4,
+}
+
+chord.s = {
+  degree1 = s{1,3,1,-3},--,3,1,2},
+  -- degree2 = s{3,5,3,1},--,3,2,4},
+  degree3 = s{5,8,5,3}--,5,5,6},
+}
+
+chord.l = l:new_pattern{
+  division = 1/32,
+  action = function()
+    chord.seq:play()
+  end
+}
+
+chord.seq = seq:new{
+  div = 64,
+  seq = {1},
+  action = function(val)
+    clock.run(
+      function()
+        chord:play{transpose = main.transpose, degree = chord.s.degree1}
+        -- chord:play{transpose = main.transpose, degree = chord.s.degree2}
+        chord:play{transpose = main.transpose, degree = chord.s.degree3}
+      end
+    )
+  end
+}
+
+
+
 bd = vox:new{
   synth = vox.midisynth,
   device = midi.connect(3),
@@ -296,8 +336,8 @@ hh.seq = seq:new{
   end
 }
 
-voices = {jf,lead,mangrove,ooh[1],ooh[2],ooh[3],ooh[4],bd,sd,hh}
-
+voices = {jf,lead,mangrove,ooh[1],ooh[2],ooh[3],ooh[4],chord,bd,sd,hh}
+oohs = {ooh[1],ooh[2],ooh[3],ooh[4]}
 
 
 
@@ -562,7 +602,7 @@ function init()
   -- crow.output[4].slew = 0.4
   
   current_part = 1
-  parts = 7
+  parts = 10
   next(current_part)
 end
 
@@ -580,6 +620,7 @@ function next(part, beat)
         clock.sync(beat)
         jf.on = false
         lead.on = false
+        -- chord.on = false
         sd.on = false
         hh.on = false
       end
@@ -624,7 +665,7 @@ function next(part, beat)
       function()
         clock.sync(beat)
         -- main.s.transpose = s{0,2,-2,4}:every(64,1,1)
-        vox.set(voices, 'negharm', true) --not great
+        ooh[3].octave = 4
       end
     )
 
@@ -632,9 +673,48 @@ function next(part, beat)
     clock.run(
       function()
         clock.sync(beat)
-        vox.set(voices, 'negharm', false)
+        ooh[3].seq.seq = {1,4,5}
       end
     )
+
+  elseif part == 7 then
+    clock.run(
+      function()
+        clock.sync(beat)
+        sd.s.div = s{8,2,6}
+      end
+    )
+
+  elseif part == 8 then
+    clock.run(
+      function()
+        clock.sync(beat)
+        -- main.s.transpose = s{0,3,7,5}:every(64,1,1)
+        sd.on = false
+        main.s.transpose = s{2,-2,3,5}:every(64,1,1)
+      end
+    )
+
+  elseif part == 9 then
+    clock.run(
+      function()
+        clock.sync(beat)
+        -- sd.s.div = s{8,2,6}
+        sd.on = true
+        bd.seq.div = 1
+        main.s.transpose = s{0,3,7,5}:every(64,1,1)
+        -- main.s.transpose = s{2,2,-2,0}:every(64,1,1)
+      end
+    )
+
+  elseif part == 10 then
+    clock.run(
+      function()
+        clock.sync(beat)
+        vox.set(voices, 'on', false)
+      end
+    )
+
   end
 
   print(current_part)
