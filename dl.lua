@@ -78,7 +78,7 @@ main = l:new_pattern{
 
 bass = vox:new{
   synth = vox.midisynth,
-  device = midi.connect(1),
+  device = midi.connect(2),
   channel = 1,
   length = 1/4,
   scale = 'lydian',
@@ -100,7 +100,7 @@ bass.seq = seq:new{
 
 lead = vox:new{
   synth = vox.midisynth,
-  device = midi.connect(1),
+  device = midi.connect(2),
   channel = 1,
   length = 1/8,
   scale = 'lydian',
@@ -122,7 +122,7 @@ lead.seq = seq:new{
 
 high = vox:new{
   synth = vox.midisynth,
-  device = midi.connect(1),
+  device = midi.connect(3),
   channel = 1,
   length = 1/8,
   scale = 'lydian',
