@@ -82,17 +82,17 @@ bass = vox:new{
   channel = 1,
   length = 1/4,
   scale = 'lydian',
-  octave = 3
+  octave = 4
 }
 
 bass.s = {
-  div = s{1,2,3,1}
+  div = s{4}
 }
 
 bass.seq = seq:new{
   div = 4,
-  step = 2,
-  seq = {1,2,3,4,5,6,7},
+  step = 1,
+  seq = {1,4,5,2},
   action = function(val)
     bass:play{degree = val}
   end
@@ -102,19 +102,19 @@ lead = vox:new{
   synth = vox.midisynth,
   device = midi.connect(2),
   channel = 1,
-  length = 1/8,
+  length = 1/32,
   scale = 'lydian',
   octave = 4
 }
 
 lead.s = {
-  div = s{1,1,1,7}
+  div = s{1,1,1}
 }
 
 lead.seq = seq:new{
-  div = 1,
-  prob = 0.5,
-  seq = {1,2,3,4,5,6,7},
+  div = 2,
+  prob = 1,
+  seq = {1,4,5,8},
   action = function(val)
     lead:play{degree = val, step = math.random(1,6)}
   end
@@ -122,21 +122,22 @@ lead.seq = seq:new{
 
 high = vox:new{
   synth = vox.midisynth,
-  device = midi.connect(3),
+  device = midi.connect(2),
   channel = 1,
-  length = 1/8,
+  length = 1/16,
   scale = 'lydian',
-  octave = 5
+  octave = 6
 }
 
 high.s = {
-  div = s{1,2,8,1,1,1,1,16}
+  div = s{1}
 }
 
 high.seq = seq:new{
   div = 1,
-  prob = 0.75,
-  seq = {1,2,3,4,5,6,7},
+  prob = 1,
+  offset = 1,
+  seq = {1,5,1,s{8,10,11}},
   action = function(val)
     high:play{degree = val, step = math.random(1,6)}
   end
