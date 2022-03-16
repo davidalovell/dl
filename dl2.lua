@@ -13,23 +13,25 @@ function key(n,z)
   end
 end
 
-sequins = include('lib/sequins_unnested'); s = sequins
-lattice = include('lib/lattice_1.2'); l = lattice:new()
-vox = include('lib/vox')
-seq = include('lib/seq')
+-- libs
 musicutil = require('musicutil')
+vox = include('lib/vox') -- voice object
+seq = include('lib/seq') -- wrapper object for sequins too allow added functionality
+sequins = include('lib/sequins_unnested'); s = sequins -- hacked version of sequins
+lattice = include('lib/lattice_1.2'); l = lattice:new()
 
 
 
 
-function sync(sync, fn)
-  return clock.run(function() clock.sync(sync); fn() end)
+-- clock helper fn
+function clock.wait(wait)
+  return clock.sleep(clock.get_beat_sec() * wait)
 end
 
 
 
 
-
+-- transport fns, digitone is master clock
 function clock.transport.start()
   l:start()
 end
@@ -99,53 +101,6 @@ bass.device.event = function(data)
     -- end
   end
 end
-
-
-
-bass2 = vox:new{
-  synth = vox.midisynth,
-  device = midi.connect(1),
-  channel = 1,
-  on = true,
-  octave = 6,
-  scale = 'lydian',
-  length = 1/4,
-  level = 0.5
-}
-
-bass2.user = {
-  cutoff = 0.4
-}
-
-bass2.action = function(self, args)
-  args.user.cutoff = math.ceil(self.user.cutoff * args.user.cutoff() * 127)
-  args.device:cc(23, args.user.cutoff, args.channel)
-end
-
-bass2.s = {
-  div = s{1,2,2,1},
-  cutoff = s{0.5,0.7,0.5,0.7,0.6}
-}
-
--- bass2.l = l:new_pattern{
---   division = 1/16,
---   action = function()
---     bass2.seq:play{div = bass2.s.div}
---   end
--- }
-
-bass2.seq = seq:new{
-  div = 1,
-  seq = {1,5,1,s{8,11,13}},
-  step = 1,
-  action = function(val)
-    bass2:play{degree = val, user = {cutoff = bass2.s.cutoff}}
-  end
-}
-
-
-
-
 
 
 
