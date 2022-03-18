@@ -19,34 +19,21 @@ l = lattice:new()
 
 pattern = l:new_pattern{
   action = function(x)
-    local note = params:get('note 1') + sequence_1()
-    local hz = musicutil.note_num_to_freq(note)
+    scale = musicutil.generate_scale(0, 'lydian', 20)
+    note = sequence() 
+    -- local q_note = musicutil.snap_note_to_array(note, scale)
+    local q_note = scale[note + 1] + params:get('note')
+    local hz = musicutil.note_num_to_freq(q_note)
     engine.hz(hz)
-
-    local note = params:get('note 2') + sequence_2() + 7
-    local hz = musicutil.note_num_to_freq(note)
-    engine.hz(hz)
-    print(x)
   end
 }
 
-sequence_1 = s{0,2,4,6,7,9,11}
-sequence_2 = s{0,2,4,6,7,9,11}
+sequence = s{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21}
 
 
 params:add_number(
-  "note 1", -- id
-  "note 1", -- name
-  0, -- min
-  127, -- max
-  60, -- default
-  function(param) return musicutil.note_num_to_name(param:get(), true) end, -- formatter
-  true -- wrap
-  )
-
-params:add_number(
-  "note 2", -- id
-  "note 2", -- name
+  "note", -- id
+  "note", -- name
   0, -- min
   127, -- max
   60, -- default
@@ -60,8 +47,7 @@ function key(n,z)
   elseif n == 3 and z == 1 then
     l:stop()
     l:reset()
-    sequence_1:reset()
-    sequence_2:reset()
+    sequence:reset()
   end
 end
 
