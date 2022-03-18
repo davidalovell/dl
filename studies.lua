@@ -7,101 +7,145 @@ end
 function r()
   norns.script.load(norns.script.state)
 end
--- spacetime
--- norns study 3
---
--- ENC 1 - sweep filter
--- ENC 2 - select edit position
--- ENC 3 - choose command
--- KEY 3 - randomize command set
---
--- spacetime is a weird function sequencer.
--- it plays a note on each step.
--- each step is a symbol for the action.
--- + = increase note
--- - = decrease note
--- < = go to bottom note
--- > = go to top note
--- * = random note
--- M = fast metro
--- m = slow metro
--- # = jump random position
---
--- augment/change this script with new functions!
 
 engine.name = "PolyPerc"
 
-note = 40
-position = 1
-step = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-STEPS = 16
-edit = 1
+musicutil = require('musicutil')
+sequins = require('sequins')
+lattice = require('lattice')
 
-function inc() note = util.clamp(note + 5, 40, 120) end
-function dec() note = util.clamp(note - 5, 40, 120) end
-function bottom() note = 40 end
-function top() note = 120 end
-function rand() note = math.random(80) + 40 end
-function metrofast() counter.time = 0.125 end
-function metroslow() counter.time = 0.25 end
-function positionrand() position = math.random(STEPS) end
+s = sequins
+l = lattice:new()
 
-act = {inc, dec, bottom, top, rand, metrofast, metroslow, positionrand}
-COMMANDS = 8
-label = {"+", "-", "<", ">", "*", "M", "m", "#"}
+pattern = l:new_pattern{
+  action = function(x)
+    local note = params:get('note 1') + sequence_1()
+    local hz = musicutil.note_num_to_freq(note)
+    engine.hz(hz)
 
-function init()
-  params:add_control("cutoff","cutoff",controlspec.new(50,5000,'exp',0,555,'hz'))
-  params:set_action("cutoff", function(x) engine.cutoff(x) end)
-  counter = metro.init(count, 0.125, -1)
-  counter:start()
-end
-
-function count()
-  position = (position % STEPS) + 1
-  act[step[position]]()
-  engine.hz(midi_to_hz(note))
-  redraw()
-end
-
-function redraw()
-  screen.clear()
-  for i=1,16 do
-    screen.level((i == edit) and 15 or 2)
-    screen.move(i*8-8,40)
-    screen.text(label[step[i]])
-    if i == position then
-      screen.move(i*8-8, 45)
-      screen.line_rel(6,0)
-      screen.stroke()
-    end
+    local note = params:get('note 2') + sequence_2() + 7
+    local hz = musicutil.note_num_to_freq(note)
+    engine.hz(hz)
+    print(x)
   end
-  screen.update()
-end
+}
 
-function enc(n,d)
-  if n == 1 then
-    params:delta("cutoff",d)
-  elseif n == 2 then
-    edit = util.clamp(edit + d, 1, STEPS)
-  elseif n == 3 then
-    step[edit] = util.clamp(step[edit]+d, 1, COMMANDS)
-  end
-  redraw()
-end
+sequence_1 = s{0,2,4,6,7,9,11}
+sequence_2 = s{0,2,4,6,7,9,11}
+
+
+params:add_number(
+  "note 1", -- id
+  "note 1", -- name
+  0, -- min
+  127, -- max
+  60, -- default
+  function(param) return musicutil.note_num_to_name(param:get(), true) end, -- formatter
+  true -- wrap
+  )
+
+params:add_number(
+  "note 2", -- id
+  "note 2", -- name
+  0, -- min
+  127, -- max
+  60, -- default
+  function(param) return musicutil.note_num_to_name(param:get(), true) end, -- formatter
+  true -- wrap
+  )
 
 function key(n,z)
-  if n==3 and z==1 then
-    randomize_steps()
+  if n == 2 and z == 1 then
+    l:start()
+  elseif n == 3 and z == 1 then
+    l:stop()
+    l:reset()
+    sequence_1:reset()
+    sequence_2:reset()
   end
 end
 
-function midi_to_hz(note)
-  return (440 / 32) * (2 ^ ((note - 9) / 12))
-end
 
-function randomize_steps()
-  for i=1,16 do
-    step[i] = math.random(COMMANDS)
-  end
-end
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- MusicUtil = require "musicutil"
+-- math.randomseed(os.time())
+
+-- function init()
+--   params:add_separator("test script")
+--   params:add_group("example group",3)
+--   for i = 1,3 do
+--     params:add{
+--       type = "option",
+--       id = "example "..i,
+--       name = "parameter "..i,
+--       options = {"hi","hello","bye"},
+--       default = i
+--     }
+--   end
+--   params:add_number(
+--     "note_number", -- id
+--     "notes with wrap", -- name
+--     0, -- min
+--     127, -- max
+--     60, -- default
+--     function(param) return MusicUtil.note_num_to_name(param:get(), true) end, -- formatter
+--     true -- wrap
+--     )
+--   local groceries = {"green onions","shitake","brown rice","pop tarts","chicken thighs","apples"}
+--   params:add_option("grocery list","grocery list",groceries,1)
+--   params:add_control("frequency","frequency",controlspec.FREQ)
+--   params:add_file("clip sample", "clip sample")
+--   params:set_action("clip sample", function(file) load_sample(file) end)
+--   params:add_text("named thing", "my name is:", "")
+--   params:add_taper("taper_example", "taper", 0.5, 6.2, 3.3, 0, "%")
+--   params:add_separator()
+--   params:add_trigger("trig", "press K3 here")
+--   params:set_action("trig",function() print("boop!") end)
+--   params:add_binary("momentary", "press K3 here", "momentary")
+--   params:set_action("momentary",function(x) print(x) end)
+--   params:add_binary("toggle", "press K3 here", "toggle",1)
+--   params:set_action("toggle",function(x)
+--     if x == 0 then
+--       params:show("secrets")
+--     elseif x == 1 then
+--       params:hide("secrets")
+--     end
+--     _menu.rebuild_params()
+--   end)
+--   params:add_text("secrets","secret!!")
+--   params:hide("secrets")
+--   params:print()
+--   random_grocery()
+-- end
+
+-- function load_sample(file)
+--   print(file)  
+-- end
+
+-- function random_grocery()
+--   params:set("grocery list",math.random(params:get_range("grocery list")[1],params:get_range("grocery list")[2]))  
+-- end
