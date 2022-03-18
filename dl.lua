@@ -1,36 +1,22 @@
--- dlß
--- digitakt, digitone, analog four: 'ghosts'
-
--- reload fns
+-- testing params with vox
 function reload()
   norns.script.load('code/dl/dl.lua')
 end
 
 function r() norns.script.load(norns.script.state) end
 
--- key press
-function key(n,z)
-  if n == 2 and z ==1 then
-    next(current_part)
-  elseif n == 3 and z == 1 then
-    r()
-  end
-end
+engine.name = "PolyPerc"
 
-
--- libs
 musicutil = require('musicutil')
 vox = include('lib/vox') -- voice object
 seq = include('lib/seq') -- wrapper object for sequins too allow added functionality
 sequins = include('lib/sequins_unnested'); s = sequins -- hacked version of sequins
 lattice = include('lib/lattice_1.2'); l = lattice:new()
 
--- clock helper fn
 function clock.wait(wait)
   return clock.sleep(clock.get_beat_sec() * wait)
 end
 
--- transport fns, digitone is master clock
 function clock.transport.start()
   l:start()
 end
@@ -41,125 +27,11 @@ function clock.transport.stop()
   vox.call(voices, 'reset')
 end
 
-
-
--- functions that are called live to play the song
-function init()
-  crow.ii.jf.mode(1)
-
-  current_part = 1
-  parts = 11
-  next(current_part)
-end
-
-
-
--- arrangement
-function next(part, beat)
-  beat = beat == nil and 4 or beat
-
-  if part == 1 then
-    clock.run(
-      function()
-        clock.sync(beat)
-
-      end
-    )
-
-  elseif part == 2 then
-    clock.run(
-      function()
-        clock.sync(beat)
-
-      end
-    )
-
-  elseif part == 3 then
-    clock.run(
-      function()
-        clock.sync(beat)
-
-      end
-    )
-
-  elseif part == 4 then
-    clock.run(
-      function()
-        clock.sync(beat)
-
-      end
-    )
-
-  elseif part == 5 then
-    clock.run(
-      function()
-        clock.sync(beat)
-
-      end
-    )
-
-  elseif part == 6 then
-    clock.run(
-      function()
-        clock.sync(beat)
-
-      end
-    )
-
-  elseif part == 7 then
-    clock.run(
-      function()
-        clock.sync(beat)
-
-      end
-    )
-
-  elseif part == 8 then
-    clock.run(
-      function()
-        clock.sync(beat)
-
-      end
-    )
-
-  elseif part == 9 then
-    clock.run(
-      function()
-        clock.sync(beat)
-
-      end
-    )
-
-  elseif part == 10 then
-    clock.run(
-      function()
-        clock.sync(beat)
-
-      end
-    )
-
-  elseif part == 11 then
-    clock.run(
-      function()
-        clock.sync(beat)
-
-      end
-    )
-
+bass = vox:new{
+  synth = function(args)
+    engine.hz(musicutil.note_num_to_freq(args.note))
   end
-
-  print(current_part)
-  current_part = current_part % parts + 1
-end
-
-
-
-
-
-
-
-
-
+}
 
 
 
