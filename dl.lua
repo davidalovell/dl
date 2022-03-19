@@ -56,34 +56,70 @@ function init()
   softcut.level(1,1.0)
   softcut.loop(1,1)
   softcut.loop_start(1,4)
-  softcut.loop_end(1,6)
+  softcut.loop_end(1,8)
   softcut.position(1,1)
   softcut.pan(1,0)
   softcut.level_slew_time(1,0.4)
-  softcut.rate_slew_time(1,0.2)
+  softcut.rate_slew_time(1,0.1)
   softcut.fade_time(1,0.1)
   softcut.phase_quant(1,1)
   softcut.event_phase(update_positions)
   softcut.poll_start_phase()
   softcut.play(1,1)
 
-  p = s{0,2,4,6,7,9,11,12}
+
+
+  params:add{
+    type="number",
+    id="start",
+    min=0,
+    max=20,
+    default=0,
+    action=function(x) softcut.loop_start(1,x) end
+  }
+
+
+
+
+  params:add{
+    type="number",
+    id="end",
+    min=0,
+    max=20,
+    default=0,
+    action=function(x) softcut.loop_end(1,x) end
+  }
+
+  params:add_taper("rate", "rate", 0.0, 10, 1, 0, "x")
+  params:set_action("rate", function(x) softcut.rate(1,x) end)
+
+
+  p = s{0,4,7,11}
   c = clock.run(
     function()
       while true do
-        clock.sync(1)
-        p:step(math.random(-3,3))
-        local note = math.pow(2,p()/12)
-        softcut.rate(1,note)
+        clock.sync(4)
+
+        p:step(math.random(1,3))
+        softcut.rate_slew_time(1,math.random()/10)
+        local note = math.pow(2, (p()/12) * toss())
+        softcut.rate(1,params:get('rate') * note)
       end
     end
   )
 
 end
 
+function toss()
+  local n
+  repeat
+    n = math.random(-1,1)
+  until( n ~= 0)
+  return n
+end
+
 function update_positions(voice,position)
   print(voice,position)
-
 end
 
 
