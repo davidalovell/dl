@@ -37,13 +37,67 @@ bass = vox:new{
 
 
 
+function init()
+  file = "/home/we/dust/audio/tape/0000.wav"
+  print_info(file)
+
+  softcut.buffer_clear()
+  softcut.buffer_read_mono(
+    file, -- file
+    0,    -- start of file to read (seconds)
+    1,    -- start of buffer to write into (seconds)
+    -1,   -- how much to read/write (seconds, use -1 for entire file) 
+    1,    -- which channel in file to read
+    1     -- which buffer to write
+  )
+
+  softcut.enable(1,1)
+  softcut.buffer(1,1)
+  softcut.level(1,1.0)
+  softcut.loop(1,1)
+  softcut.loop_start(1,4)
+  softcut.loop_end(1,6)
+  softcut.position(1,1)
+  softcut.pan(1,0)
+  softcut.level_slew_time(1,0.4)
+  softcut.rate_slew_time(1,0.2)
+  softcut.fade_time(1,0.1)
+  softcut.phase_quant(1,1)
+  softcut.event_phase(update_positions)
+  softcut.poll_start_phase()
+  softcut.play(1,1)
+
+  p = s{0,2,4,6,7,9,11,12}
+  c = clock.run(
+    function()
+      while true do
+        clock.sync(1)
+        p:step(math.random(-3,3))
+        local note = math.pow(2,p()/12)
+        softcut.rate(1,note)
+      end
+    end
+  )
+
+end
+
+function update_positions(voice,position)
+  print(voice,position)
+
+end
 
 
-
-
-
-
-
+function print_info(file)
+  if util.file_exists(file) == true then
+    local ch, samples, samplerate = audio.file_info(file)
+    local duration = samples/samplerate
+    print("loading file: "..file)
+    print("  channels:\t"..ch)
+    print("  samples:\t"..samples)
+    print("  sample rate:\t"..samplerate.."hz")
+    print("  duration:\t"..duration.." sec")
+  else print "read_wav(): file not found" end
+end
 
 
 -- -- objects (vox, sequins, lattice, seq), vox is the main object and other objects are stored in its table
