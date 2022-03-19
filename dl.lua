@@ -41,6 +41,8 @@ function init()
   file = "/home/we/dust/audio/tape/0000.wav"
   print_info(file)
 
+  sync = 2
+
   softcut.buffer_clear()
   softcut.buffer_read_mono(
     file, -- file
@@ -93,12 +95,16 @@ function init()
   params:add_taper("rate", "rate", 0.0, 10, 1, 0, "x")
   params:set_action("rate", function(x) softcut.rate(1,x) end)
 
+  params:add_taper("sync", "sync", 1/16, 10, 1, 0, "x")
+  params:set_action("sync", function(x) sync = x end)
+
+
 
   p = s{0,4,7,11}
   c = clock.run(
     function()
       while true do
-        clock.sync(4)
+        clock.sync(sync)
 
         p:step(math.random(1,3))
         softcut.rate_slew_time(1,math.random()/10)
