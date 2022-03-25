@@ -51,8 +51,8 @@ bass = vox:new{
   synth = vox.midisynth,
   device = midi.connect(1),
   channel = 1,
-  on = true,
-  octave = 5,
+  level = 0.6,
+  octave = 4,
   scale = 'lydian',
   length = 1/4
 }
@@ -67,7 +67,7 @@ bass.action = function(self, args)
 end
 
 bass.s = {
-  div = s{4,3,1},
+  div = s{2,1,1},
   cutoff = s{0.5,0.7,0.5,0.7,0.6}
 }
 
@@ -84,8 +84,9 @@ bass.l = l:new_pattern{
 }
 
 bass.seq = seq:new{
-  div = 2,
-  seq = {1},
+  div = 4,
+  step = 2,
+  seq = {1,4,5,7,9},
   action = function(val)
     bass:play{degree = val, user = {cutoff = bass.s.cutoff}}
   end
@@ -105,4 +106,67 @@ end
 
 
 
-voices = {bass}
+lead = vox:new{
+  synth = vox.midisynth,
+  device = midi.connect(1),
+  channel = 1,
+  level = 0.6,
+  octave = 5,
+  scale = 'lydian',
+  length = 1/4
+}
+
+lead.s = {
+  div = s{2,2,1,7},
+  octave = s{0,1}:every(4,1,1)
+}
+
+lead.l = l:new_pattern{
+  division = 1/16,
+  action = function()
+    lead.seq:play{div = lead.s.div}
+  end
+}
+
+lead.seq = seq:new{
+  div = 1,
+  seq = {1,3,4,5,7},
+  action = function(val)
+    lead:play{degree = val, octave = lead.s.octave}
+  end
+}
+
+high = vox:new{
+  synth = vox.midisynth,
+  device = midi.connect(1),
+  channel = 1,
+  level = 0.8,
+  octave = 5,
+  degree = 5,
+  scale = 'lydian',
+  length = 3/4
+}
+
+high.s = {
+  div = s{2,2,1,7},
+  octave = s{0,1}:every(4,1,1)
+}
+
+high.l = l:new_pattern{
+  division = 1/16,
+  action = function()
+    high.seq:play{div = high.s.div}
+  end
+}
+
+high.seq = seq:new{
+  div = 3,
+  seq = {1,3,4,5,7},
+  action = function(val)
+    high:play{degree = val, octave = high.s.octave}
+  end
+}
+
+
+
+voices = {bass,lead,high}
