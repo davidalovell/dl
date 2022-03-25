@@ -29,8 +29,6 @@ function clock.wait(wait)
 end
 
 
-
-
 -- transport fns, digitone is master clock
 function clock.transport.start()
   l:start()
@@ -53,7 +51,8 @@ bass = vox:new{
   channel = 1,
   level = 0.6,
   octave = 4,
-  scale = 'lydian',
+  scale = 'dorian',
+  negharm = true,
   length = 1/4
 }
 
@@ -112,12 +111,13 @@ lead = vox:new{
   channel = 1,
   level = 0.6,
   octave = 5,
-  scale = 'lydian',
+  scale = 'dorian',
+  negharm = true,
   length = 1/4
 }
 
 lead.s = {
-  div = s{2,2,1,7},
+  div = s{2,2,1,7,16},
   octave = s{0,1}:every(4,1,1)
 }
 
@@ -141,14 +141,16 @@ high = vox:new{
   device = midi.connect(1),
   channel = 1,
   level = 0.8,
+  wrap = true,
   octave = 5,
   degree = 5,
-  scale = 'lydian',
+  scale = 'dorian',
+  negharm = true,
   length = 3/4
 }
 
 high.s = {
-  div = s{2,2,1,7},
+  div = s{2,2,1,7,15},
   octave = s{0,1}:every(4,1,1)
 }
 
@@ -170,3 +172,49 @@ high.seq = seq:new{
 
 
 voices = {bass,lead,high}
+
+
+
+
+clock.run(
+  function()
+    while true do 
+      clock.wait(16)
+      print(1)
+      vox.set(voices, 'degree', 1)
+      vox.set(voices, 'negharm', true)
+
+      clock.wait(16)
+      print(2)
+      vox.set(voices, 'degree', 1)
+      vox.set(voices, 'negharm', false)
+
+      clock.wait(16)
+      print(3)
+      vox.set(voices, 'degree', -3)
+      vox.set(voices, 'negharm', false)
+
+      clock.wait(16)
+      print(4)
+      vox.set(voices, 'degree', -2)
+      vox.set(voices, 'negharm', true)
+      
+      -- clock.wait(8)
+      -- print(3)
+      -- vox.set(voices, 'degree', 0)
+      -- vox.set(voices, 'negharm', false)
+
+      -- clock.wait(8)
+      -- print(4)
+      -- vox.set(voices, 'degree', -2)
+      -- vox.set(voices, 'negharm', false)
+
+      -- clock.wait(8)
+      -- print(1)
+      -- vox.set(voices, 'degree', 1)
+      -- vox.set(voices, 'negharm', true)
+
+      
+    end
+  end
+)
