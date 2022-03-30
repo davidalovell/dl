@@ -170,51 +170,62 @@ high.seq = seq:new{
 }
 
 
+wingie = vox:new{
+  synth = vox.midisynth,
+  device = midi.connect(2),
+  channel = 1,
+  level = 1,
+  octave = 5,
+  scale = 'dorian',
+  negharm = true,
+  length = 1/4
+}
+
 
 voices = {bass,lead,high}
 
 
 
 
-clock.run(
-  function()
-    while true do 
-      clock.wait(16)
-      print(1)
-      vox.set(voices, 'degree', 1)
-      vox.set(voices, 'negharm', true)
+-- clock.run(
+--   function()
+--     while true do 
+--       clock.wait(16)
+--       print(1)
+--       vox.set(voices, 'degree', 1)
+--       vox.set(voices, 'negharm', true)
 
-      clock.wait(16)
-      print(2)
-      vox.set(voices, 'degree', 1)
-      vox.set(voices, 'negharm', false)
+--       clock.wait(16)
+--       print(2)
+--       vox.set(voices, 'degree', 1)
+--       vox.set(voices, 'negharm', false)
 
-      clock.wait(16)
-      print(3)
-      vox.set(voices, 'degree', -3)
-      vox.set(voices, 'negharm', false)
+--       clock.wait(16)
+--       print(3)
+--       vox.set(voices, 'degree', -3)
+--       vox.set(voices, 'negharm', false)
 
-      clock.wait(16)
-      print(4)
-      vox.set(voices, 'degree', -2)
-      vox.set(voices, 'negharm', true)
+--       clock.wait(16)
+--       print(4)
+--       vox.set(voices, 'degree', -2)
+--       vox.set(voices, 'negharm', true)
       
-      -- clock.wait(8)
-      -- print(3)
-      -- vox.set(voices, 'degree', 0)
-      -- vox.set(voices, 'negharm', false)
+--       -- clock.wait(8)
+--       -- print(3)
+--       -- vox.set(voices, 'degree', 0)
+--       -- vox.set(voices, 'negharm', false)
 
-      -- clock.wait(8)
-      -- print(4)
-      -- vox.set(voices, 'degree', -2)
-      -- vox.set(voices, 'negharm', false)
+--       -- clock.wait(8)
+--       -- print(4)
+--       -- vox.set(voices, 'degree', -2)
+--       -- vox.set(voices, 'negharm', false)
 
-      -- clock.wait(8)
-      -- print(1)
-      -- vox.set(voices, 'degree', 1)
-      -- vox.set(voices, 'negharm', true)
+--       -- clock.wait(8)
+--       -- print(1)
+--       -- vox.set(voices, 'degree', 1)
+--       -- vox.set(voices, 'negharm', true)
 
       
-    end
-  end
-)
+--     end
+--   end
+-- )
