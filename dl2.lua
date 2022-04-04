@@ -52,7 +52,7 @@ bass = vox:new{
   level = 0.6,
   octave = 4,
   scale = 'dorian',
-  negharm = true,
+  negharm = false,
   length = 1/4
 }
 
@@ -85,7 +85,7 @@ bass.l = l:new_pattern{
 bass.seq = seq:new{
   div = 4,
   step = 2,
-  seq = {1,4,5,7,9},
+  seq = {1,4,5,7,5},
   action = function(val)
     bass:play{degree = val, user = {cutoff = bass.s.cutoff}}
   end
@@ -112,13 +112,13 @@ lead = vox:new{
   level = 0.6,
   octave = 5,
   scale = 'dorian',
-  negharm = true,
+  negharm = false,
   length = 1/4
 }
 
 lead.s = {
   div = s{2,2,1,7,16},
-  octave = s{0,1}:every(4,1,1)
+  octave = s{0,1}:every(2,1,1)
 }
 
 lead.l = l:new_pattern{
@@ -130,7 +130,7 @@ lead.l = l:new_pattern{
 
 lead.seq = seq:new{
   div = 1,
-  seq = {1,3,4,5,7},
+  seq = {1,3,5},
   action = function(val)
     lead:play{degree = val, octave = lead.s.octave}
   end
@@ -141,17 +141,17 @@ high = vox:new{
   device = midi.connect(1),
   channel = 1,
   level = 0.8,
-  wrap = true,
-  octave = 5,
-  degree = 5,
+  wrap = false,
+  octave = 6,
+  degree = 1,
   scale = 'dorian',
-  negharm = true,
+  negharm = false,
   length = 3/4
 }
 
 high.s = {
   div = s{2,2,1,7,15},
-  octave = s{0,1}:every(4,1,1)
+  octave = s{0,1}:every(2,1,1)
 }
 
 high.l = l:new_pattern{
@@ -163,7 +163,7 @@ high.l = l:new_pattern{
 
 high.seq = seq:new{
   div = 3,
-  seq = {1,3,4,5,7},
+  seq = {1,3,4,5,9,8},
   action = function(val)
     high:play{degree = val, octave = high.s.octave}
   end
@@ -175,9 +175,9 @@ wingie = vox:new{
   device = midi.connect(2),
   channel = 1,
   level = 1,
-  octave = 5,
+  octave = 6,
   scale = 'dorian',
-  negharm = true,
+  negharm = false,
   length = 1/4
 }
 
