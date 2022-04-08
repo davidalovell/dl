@@ -83,7 +83,7 @@ bass.l = l:new_pattern{
 }
 
 bass.seq = seq:new{
-  div = 4,
+  div = 8,
   step = 2,
   seq = {1,4,5,7,5},
   action = function(val)
@@ -117,7 +117,7 @@ lead = vox:new{
 }
 
 lead.s = {
-  div = s{2,2,1,7,16},
+  div = s{2,2,1,7,36},
   octave = s{0,1}:every(2,1,1)
 }
 
@@ -150,7 +150,7 @@ high = vox:new{
 }
 
 high.s = {
-  div = s{2,2,1,7,15},
+  div = s{2,2,1,7,52},
   octave = s{0,1}:every(2,1,1)
 }
 
