@@ -50,10 +50,11 @@ bass = vox:new{
   device = midi.connect(1),
   channel = 1,
   level = 0.6,
-  octave = 4,
+  octave = 3,
   scale = 'dorian',
   negharm = false,
-  length = 1/4
+  length = 1/4,
+  on = false
 }
 
 bass.user = {
@@ -113,7 +114,8 @@ lead = vox:new{
   octave = 5,
   scale = 'dorian',
   negharm = false,
-  length = 1/4
+  length = 1/4,
+  on = false
 }
 
 lead.s = {
@@ -146,7 +148,8 @@ high = vox:new{
   degree = 1,
   scale = 'dorian',
   negharm = false,
-  length = 3/4
+  length = 3/4,
+  on = false
 }
 
 high.s = {
@@ -170,6 +173,45 @@ high.seq = seq:new{
 }
 
 
+a4 = vox:new{
+  synth = vox.midisynth,
+  device = midi.connect(2),
+  channel = 1,
+  level = 0.8,
+  wrap = false,
+  octave = 5,
+  degree = 1,
+  scale = 'dorian',
+  negharm = false,
+  length = 4,
+  on = false
+}
+
+a4.s = {
+  div = s{2},
+  -- octave = s{0,1}:every(2,1,1)
+}
+
+a4.l = l:new_pattern{
+  division = 1/16,
+  action = function()
+    a4.seq:play{div = a4.s.div}
+  end
+}
+
+a4.seq = seq:new{
+  div = 32,
+  seq = {1,5},
+  action = function(val)
+    a4:play{degree = val}
+    a4:play{degree = val + 4}
+  end
+}
+
+I = {1,3,4,5,7}
+V = {1,4,6,7}
+VII = {2,4,7}
+
 -- wingie = vox:new{
 --   synth = vox.midisynth,
 --   device = midi.connect(2),
@@ -182,53 +224,33 @@ high.seq = seq:new{
 -- }
 
 
-voices = {bass,lead,high}
+voices = {bass,lead,high,a4}
 
 
 
+function init()
 
--- clock.run(
---   function()
---     while true do 
---       clock.wait(16)
---       print(1)
---       vox.set(voices, 'degree', 1)
---       vox.set(voices, 'negharm', true)
+  print(1)
+  vox.set(voices, 'mask', I)
 
---       clock.wait(16)
---       print(2)
---       vox.set(voices, 'degree', 1)
---       vox.set(voices, 'negharm', false)
+  clock.run(
+    function()
+      while true do 
+        clock.wait(32)
+        print(5)
+        vox.set(voices, 'mask', V)
+        clock.wait(16)
+        print(7)
+        vox.set(voices, 'mask', VII)
+        clock.wait(16)
+        print(1)
+        vox.set(voices, 'mask', I)
 
---       clock.wait(16)
---       print(3)
---       vox.set(voices, 'degree', -3)
---       vox.set(voices, 'negharm', false)
+      end
+    end
+  )
 
---       clock.wait(16)
---       print(4)
---       vox.set(voices, 'degree', -2)
---       vox.set(voices, 'negharm', true)
-      
---       -- clock.wait(8)
---       -- print(3)
---       -- vox.set(voices, 'degree', 0)
---       -- vox.set(voices, 'negharm', false)
-
---       -- clock.wait(8)
---       -- print(4)
---       -- vox.set(voices, 'degree', -2)
---       -- vox.set(voices, 'negharm', false)
-
---       -- clock.wait(8)
---       -- print(1)
---       -- vox.set(voices, 'degree', 1)
---       -- vox.set(voices, 'negharm', true)
-
-      
---     end
---   end
--- )
+end
 
 -- > vox.set(voices, 'mask', {1,2,4,6})
 -- <ok>
