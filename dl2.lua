@@ -32,6 +32,7 @@ end
 -- transport fns, digitone is master clock
 function clock.transport.start()
   l:start()
+  go()
 end
 
 function clock.transport.stop()
@@ -54,7 +55,7 @@ bass = vox:new{
   scale = 'dorian',
   negharm = false,
   length = 1/4,
-  on = false
+  on = true
 }
 
 bass.user = {
@@ -184,7 +185,7 @@ a4 = vox:new{
   scale = 'dorian',
   negharm = false,
   length = 4,
-  on = false
+  on = true
 }
 
 a4.s = {
@@ -208,6 +209,39 @@ a4.seq = seq:new{
   end
 }
 
+bd = vox:new{
+  synth = vox.midisynth,
+  device = midi.connect(3),
+  channel = 1,
+  level = 0.8,
+  wrap = false,
+  octave = 5,
+  degree = 1,
+  scale = 'dorian',
+  negharm = false,
+  length = 1/4,
+  on = true
+}
+
+a4.s = {
+  div = s{1},
+}
+
+bd.l = l:new_pattern{
+  division = 1/16,
+  action = function()
+    bd.seq:play{div = bd.s.div}
+  end
+}
+
+bd.seq = seq:new{
+  div = 8,
+  seq = {1},
+  action = function(val)
+    bd:play{degree = val}
+  end
+}
+
 I = {1,3,4,5,7}
 V = {1,4,6,7}
 VII = {2,4,7}
@@ -224,11 +258,11 @@ VII = {2,4,7}
 -- }
 
 
-voices = {bass,lead,high,a4}
+voices = {bass,lead,high,a4,bd}
 
 
 
-function init()
+function go()
 
   print(1)
   vox.set(voices, 'mask', I)
