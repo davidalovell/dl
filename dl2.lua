@@ -66,7 +66,7 @@ bass.action = function(self, args)
 end
 
 bass.s = {
-  div = s{2,1,1},
+  div = s{8,6,1,1},
   cutoff = s{0.5,0.7,0.5,0.7,0.6}
 }
 
@@ -76,15 +76,15 @@ bass.l = l:new_pattern{
     local a = bass.seq:play{div = bass.s.div}
     -- the below doesnt work, but it would be nice if it did
     -- add a property to seq which says if the val returned a note the last time
-    -- if not a then 
+    -- if not a then
     --   local b = bass2.seq:play{div = bass2.s.div}
     -- end
   end
 }
 
 bass.seq = seq:new{
-  div = 8,
-  step = 2,
+  div = 4,
+  step = 1,
   seq = {1,4,5,7,5},
   action = function(val)
     bass:play{degree = val, user = {cutoff = bass.s.cutoff}}
@@ -130,7 +130,7 @@ lead.l = l:new_pattern{
 
 lead.seq = seq:new{
   div = 1,
-  seq = {1,3,5},
+  seq = {1,3,5,7,9},
   action = function(val)
     lead:play{degree = val, octave = lead.s.octave}
   end
@@ -170,16 +170,16 @@ high.seq = seq:new{
 }
 
 
-wingie = vox:new{
-  synth = vox.midisynth,
-  device = midi.connect(2),
-  channel = 1,
-  level = 1,
-  octave = 6,
-  scale = 'dorian',
-  negharm = false,
-  length = 1/4
-}
+-- wingie = vox:new{
+--   synth = vox.midisynth,
+--   device = midi.connect(2),
+--   channel = 1,
+--   level = 1,
+--   octave = 6,
+--   scale = 'dorian',
+--   negharm = false,
+--   length = 1/4
+-- }
 
 
 voices = {bass,lead,high}
@@ -229,3 +229,8 @@ voices = {bass,lead,high}
 --     end
 --   end
 -- )
+
+-- > vox.set(voices, 'mask', {1,2,4,6})
+-- <ok>
+
+-- > vox.set(voices, 'mask', {1,2,3,5})
