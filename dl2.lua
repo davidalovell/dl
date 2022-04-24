@@ -223,7 +223,7 @@ bd = vox:new{
   on = true
 }
 
-a4.s = {
+bd.s = {
   div = s{1},
 }
 
@@ -242,9 +242,31 @@ bd.seq = seq:new{
   end
 }
 
-I = {1,3,4,5,7}
-V = {1,4,6,7}
-VII = {2,4,7}
+jf = vox:new{
+  synth = vox.jfnote,
+  level = 3,
+  wrap = false,
+  octave = 0,
+  degree = 1,
+  scale = 'dorian',
+  negharm = false,
+  length = 1/4,
+  on = true
+}
+
+jf.s = {
+  seq = s{1,5, 4,1, 7,4, 7,6, 0,1},
+  div = s{2/4,13/4,1/4}
+}
+
+jf.l = l:new_pattern{
+  division = 1/16,
+  action = function()
+    jf.l:set_division(jf.s.div())
+    jf:play{degree = jf.s.seq}
+    -- jf.seq:play{div = jf.s.div}
+  end
+}
 
 -- wingie = vox:new{
 --   synth = vox.midisynth,
@@ -258,11 +280,17 @@ VII = {2,4,7}
 -- }
 
 
-voices = {bass,lead,high,a4,bd}
+
+
+voices = {bass,lead,high,a4,bd,jf}
 
 
 
 function go()
+
+  I = {1,3,4,5,7}
+  V = {1,4,6,7}
+  VII = {2,4,6,7}
 
   print(1)
   vox.set(voices, 'mask', I)
