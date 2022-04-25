@@ -10,6 +10,10 @@ function key(n,z)
   -- key actions: n = number, z = state
   if n == 3 and z == 1 then
     r()
+
+  elseif n == 2 and z == 1 then
+    stop()
+    
   end
 end
 
@@ -42,7 +46,9 @@ function clock.transport.stop()
 end
 
 
-
+function stop()
+  vox.set(voices, 'on', false)
+end
 
 
 -- typical contstruct
