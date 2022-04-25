@@ -236,7 +236,7 @@ bd.l = l:new_pattern{
 
 bd.seq = seq:new{
   div = 8,
-  seq = {1},
+  seq = {1,1,1,4,1,1,1,1},
   action = function(val)
     bd:play{degree = val}
   end
@@ -251,19 +251,21 @@ jf = vox:new{
   scale = 'dorian',
   negharm = false,
   length = 1/4,
-  on = true
+  on = false
 }
 
 jf.s = {
-  seq = s{1,5, 4,1, 7,4, 7,6, 0,1},
-  div = s{2/4,13/4,1/4}
+  degree = s{1,5, 4,1, 7,4, 7,6, 0,1},
+  offset = s{0,0,0,3,5,5},
+  div = s{2/4,13/4,1/4,  2/4,1/4,13/4},
+  -- octave = s{0,0,0,1,1,0,0}
 }
 
 jf.l = l:new_pattern{
-  division = 1/16,
+  -- division = 1/16,
   action = function()
     jf.l:set_division(jf.s.div())
-    jf:play{degree = jf.s.seq}
+    jf:play{degree = jf.s.degree() + jf.s.offset()}--, octave = jf.s.octave}
     -- jf.seq:play{div = jf.s.div}
   end
 }
