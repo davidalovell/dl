@@ -10,11 +10,16 @@
 -- or some kind of distortion
 -- a frazzled, burnished sound
 -- light on reverb, OR distorted reverb
+-- delay is good though!
 -- slow
 -- lots of space
 -- myxolydian b6
 -- take your time changing chord
 -- repeated melody ?very slowly changing
+-- carefully play with the compressor
+-- midi control to the compressor?
+-- or maybe just hands on
+-- that might be a bit ambitious
 
 
 
