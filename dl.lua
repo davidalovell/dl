@@ -1,5 +1,23 @@
--- dlß
--- digitakt, digitone, analog four: 'ghosts'
+-- dl
+-- New Project 12 May 2022
+-- Elektron Project Name: 'Wow'
+
+-- ideas
+-- just use vox, sequins and clock
+-- use the MI system
+-- use the second tape delay!
+-- use the analog drive
+-- or some kind of distortion
+-- a frazzled, burnished sound
+-- light on reverb, OR distorted reverb
+-- slow
+-- lots of space
+-- myxolydian b6
+-- take your time changing chord
+-- repeated melody ?very slowly changing
+
+
+
 
 -- reload fns
 function reload()
