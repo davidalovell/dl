@@ -2,21 +2,25 @@
 
 -- reload
 function reload()
-  norns.script.load('code/dl/learningsc.lua')
+  norns.script.load('code/dl/sc.lua')
 end
 
-function r() norns.script.load(norns.script.state) end
+function r()
+  norns.script.load(norns.script.state)
+end
 
 function key(n,z)
   -- key actions: n = number, z = state
-  if n == 3 and z == 1 then
-    r()
-    clock_transport_start()
+  if n == 2 and z == 1 then
+    -- r()
+    l:start()
 
-  elseif n == 2 and z == 1 then
-    stop()
-    clock_transport_stop()
-    
+  elseif n == 3 and z == 1 then
+    l:stop()
+    l:reset()
+    vox.call(voices, 'reset')
+
+    -- vox.set(voices, 'on', false)
   end
 end
 
@@ -27,35 +31,33 @@ seq = include('lib/seq') -- wrapper object for sequins too allow added functiona
 sequins = include('lib/sequins_unnested'); s = sequins -- hacked version of sequins
 lattice = include('lib/lattice_1.2'); l = lattice:new()
 
+-- engine
+engine.name = 'PolyPerc'
+
+function vox.polyperc(args)
+  engine.amp(args.level/100)
+  engine.release(args.length)
+  engine.cutoff(args.user.cutoff*100)
+  engine.pan(args.user.pan)
+  engine.hz(musicutil.note_num_to_freq(args.note))
+end
+
 -- clock helper fn
 function clock.wait(wait)
   return clock.sleep(clock.get_beat_sec() * wait)
 end
 
--- transport fns, digitone is master clock
-function clock_transport_start()
-  l:start()
+function init()
+  voices = {bass, mid, high}
+  engine.amp(0.7)
+  engine.release(2) 
 end
-
-function clock_transport_stop()
-  l:stop()
-  l:reset()
-  vox.call(voices, 'reset')
-end
-
-
-function stop()
-  vox.set(voices, 'on', false)
-end
-
 
 -- typical contstruct
 bass = vox:new{
-  synth = vox.midisynth,
-  device = midi.connect(1),
-  channel = 1,
+  synth = vox.polyperc,
   level = 0.6,
-  octave = 5,
+  octave = 3,
   scale = 'dorian',
   negharm = false,
   length = 1/4,
@@ -63,18 +65,15 @@ bass = vox:new{
 }
 
 bass.user = {
-  cutoff = 0.4
+  cutoff = 10,
+  pan = 0
 }
 
-bass.action = function(self, args)
-  -- args.user.cutoff = math.ceil(self.user.cutoff * args.user.cutoff() * 127)
-  -- args.device:cc(23, args.user.cutoff, args.channel)
-end
-
 bass.s = {
-  div = s{1,1,6,1,1,1,5,1,1,1,1,4},
-  cutoff = s{0.5,0.7,0.5,0.7,0.6},
-  octave = s{0,0,1,0,1}
+  div = s{1,1,1,1,1,1,2},
+  octave = s{0,1,0,1,1},
+  length = s{4,1,2,1/2},
+  cutoff = s{5,3,7,8,15,20}
 }
 
 bass.l = l:new_pattern{
@@ -90,42 +89,117 @@ bass.l = l:new_pattern{
 }
 
 bass.seq = seq:new{
-  div = 1,
-  step = 3,
-  seq = {1,2,3,4,5},
+  div = 3,
+  step = 1,
+  seq = {1,3,5,7},
   action = function(val)
-    bass:play{degree = val, octave = bass.s.octave, user = {cutoff = bass.s.cutoff}}
+    bass:play{degree = val, octave = bass.s.octave, length = bass.s.length, user = {cutoff = bass.s.cutoff(), pan = bass.user.pan}}
   end
 }
 
 
 
-bass.device.event = function(data)
-  local msg = midi.to_msg(data)
-  if msg.type == 'cc' then
-    -- if msg.cc == 70 then
-    --   bass.seq.skip = math.floor(msg.val) + 1
-    -- end
-  end
-end
 
 
 
 
 
 
-
-bass2 = vox:new{
-  synth = vox.midisynth,
-  device = midi.connect(1),
-  channel = 1,
+mid = vox:new{
+  synth = vox.polyperc,
   level = 0.6,
-  octave = 5,
+  octave = 4,
   scale = 'dorian',
   negharm = false,
   length = 1/4,
   on = true
 }
+
+mid.user = {
+  cutoff = 10,
+  pan = -1/4
+}
+
+mid.s = {
+  div = s{1,1,1,1,1,1,2},
+  octave = s{0,1,1,2,2},
+  length = s{3,2,4,1/2,1},
+  cutoff = s{10,11,12,13,14}
+}
+
+mid.l = l:new_pattern{
+  division = 1/16,
+  action = function()
+    local a = mid.seq:play{div = mid.s.div}
+    -- the below doesnt work, but it would be nice if it did
+    -- add a property to seq which says if the val returned a note the last time
+    -- if not a then
+    --   local b = bass2.seq:play{div = bass2.s.div}
+    -- end
+  end
+}
+
+mid.seq = seq:new{
+  div = 2,
+  step = 3,
+  seq = {1,3,5,7},
+  action = function(val)
+    mid:play{degree = val, octave = mid.s.octave, length = mid.s.length, user = {cutoff = mid.s.cutoff(), pan = mid.user.pan}}
+  end
+}
+
+
+
+
+
+
+
+
+
+
+high = vox:new{
+  synth = vox.polyperc,
+  level = 0.8,
+  octave = 4,
+  scale = 'dorian',
+  negharm = false,
+  length = 1/4,
+  on = true
+}
+
+high.user = {
+  cutoff = 10,
+  pan = 1/4
+}
+
+high.s = {
+  div = s{1,1,1,1,1,1,2},
+  octave = s{1,2,2},
+  length = s{5,2,7,1,6,3,5},
+  cutoff = s{18,16,20,22}
+}
+
+high.l = l:new_pattern{
+  division = 1/16,
+  action = function()
+    local a = high.seq:play{div = high.s.div}
+    -- the below doesnt work, but it would be nice if it did
+    -- add a property to seq which says if the val returned a note the last time
+    -- if not a then
+    --   local b = bass2.seq:play{div = bass2.s.div}
+    -- end
+  end
+}
+
+high.seq = seq:new{
+  div = 5,
+  step = 2,
+  seq = {1,7,9,11},
+  action = function(val)
+    high:play{degree = val, octave = high.s.octave, length = high.s.length, user = {cutoff = high.s.cutoff(), pan = high.user.pan}}
+  end
+}
+
 
 
 
