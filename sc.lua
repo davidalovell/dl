@@ -14,6 +14,7 @@ function key(n,z)
   if n == 2 and z == 1 then
     -- r()
     l:start()
+    softcut.play(1,1)
 
   elseif n == 3 and z == 1 then
     l:stop()
@@ -51,6 +52,37 @@ function init()
   voices = {bass, mid, high}
   engine.amp(0.7)
   engine.release(2) 
+
+
+file = _path.dust.."audio/tape/0018.wav"
+
+ -- clear buffer
+ softcut.buffer_clear()
+ -- read file into buffer
+ -- buffer_read_mono (file, start_src, start_dst, dur, ch_src, ch_dst)
+ softcut.buffer_read_mono(file,1,1,-1,1,1)
+ 
+ -- enable voice 1
+ softcut.enable(1,1)
+ -- set voice 1 to buffer 1
+ softcut.buffer(1,1)
+ -- set voice 1 level to 1.0
+ softcut.level(1,0.5)
+ -- voice 1 enable loop
+ softcut.loop(1,1)
+ -- set voice 1 loop start to 1
+ softcut.loop_start(1,20)
+ -- set voice 1 loop end to 2
+ softcut.loop_end(1,60)
+ -- set voice 1 position to 1
+ softcut.position(1,1)
+ -- set voice 1 rate to 1.0
+ softcut.rate(1,1)
+ -- enable voice 1 play
+
+
+
+
 end
 
 -- typical contstruct
@@ -159,7 +191,7 @@ mid.seq = seq:new{
 
 high = vox:new{
   synth = vox.polyperc,
-  level = 0.8,
+  level = 0.5,
   octave = 4,
   scale = 'dorian',
   negharm = false,
@@ -174,7 +206,7 @@ high.user = {
 
 high.s = {
   div = s{1,1,1,1,1,1,2},
-  octave = s{1,2,2},
+  octave = s{1,1,-1},
   length = s{5,2,7,1,6,3,5},
   cutoff = s{18,16,20,22}
 }
@@ -193,17 +225,12 @@ high.l = l:new_pattern{
 
 high.seq = seq:new{
   div = 5,
-  step = 2,
+  step = 1,
   seq = {1,7,9,11},
   action = function(val)
     high:play{degree = val, octave = high.s.octave, length = high.s.length, user = {cutoff = high.s.cutoff(), pan = high.user.pan}}
   end
 }
-
-
-
-
-
 
 
 
